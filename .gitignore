@@ -1,3 +1,4 @@
 # Matlab autogen files.
 *.asv
 *.m~
+~$*
