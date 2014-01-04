@@ -12,28 +12,63 @@
 
 
 %% Ferest Tests
-
-numFerns = 10;
+times = zeros(2,100);
+ferests = cell(1,100);
+numFerns = 3;
 numTests = 10;
-ferest = Ferest(numFerns, numTests);
-tic
-ferest = ferest.trainRandom(train_data, train_labels);
-display('Elapsed time for the training of the FEREST:')
-toc
 
+sample = valid_data(1,:);
 
-% left entry for correct, right for wrong :)
-% accuracy = [0, 0];
-% tic
-% for i = 1:size(train_data,1)
-%     sample = train_data(i,:);
-%     [class, posterior] = ferest.evaluate(sample);
-%     if strcmp(class,train_labels{i}) == 1
-%         accuracy(1) = accuracy(1)+1;
-%     else
-%         accuracy(2) = accuracy(2)+1;
-%     end
-% end
-% display('Elapsed time for evaluation of the training set:');
-% toc
-% accuracy = accuracy/sum(accuracy)
+numRuns = 25;
+
+for i = 1:numRuns
+    ferests{i} = Ferest(numFerns, numTests);
+    tic
+    ferests{i} = ferests{i}.trainRandom(train_data, train_labels);
+    % display('Elapsed time for the training of the FEREST:')
+    times(1,i) = toc;
+    tic
+    ferests{i}.evaluate(sample);
+    times(2,i) = toc;
+    display(i)
+end
+
+save('Evaluation/timesOneOneToHundred.mat','times')
+save('Evaluation/ferestsOneOneToHundred.mat','ferests')
+
+% top line for training data, bottom for validation
+accuracies = zeros(2,25);
+
+for i = 1:numRuns
+    tic
+    accuracy = [0, 0];
+    for j = 1:size(train_data,1)
+        sample = train_data(j,:);
+        [class, posterior] = ferests{i}.evaluate(sample);
+        if strcmp(class,train_labels{j}) == 1
+            accuracy(1) = accuracy(1)+1;
+        else
+            accuracy(2) = accuracy(2)+1;
+        end
+    end
+    accuracy = accuracy/sum(accuracy);
+    accuracies(1,i) = accuracy(1);
+    
+    
+    accuracy = [0, 0];
+    for j = 1:size(valid_data,1)
+        sample = valid_data(j,:);
+        [class, posterior] = ferests{i}.evaluate(sample);
+        if strcmp(class,valid_labels{j}) == 1
+            accuracy(1) = accuracy(1)+1;
+        else
+            accuracy(2) = accuracy(2)+1;
+        end
+    end
+    accuracy = accuracy/sum(accuracy);
+    accuracies(2,i) = accuracy(1);
+    display(i)
+    toc
+end
+
+save('Evaluation/accuraciesOneOneToTwentyfive.mat','accuracies')

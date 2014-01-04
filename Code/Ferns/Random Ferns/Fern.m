@@ -18,6 +18,7 @@ classdef Fern
             obj.histograms = zeros(5,2^numTests);
             obj.numTests = numTests;
         end
+
         
         function obj = trainRandom(obj, train_data, ...
                 train_labels, min_data, max_data)
@@ -69,7 +70,7 @@ classdef Fern
                             end
                         else
                             orderedStrings = sort({train_data{j,obj.testList{k,1}};obj.testList{k,2}});
-                            if cstrcmp(train_data{j,obj.testList{k,1}},orderedStrings{1}) <= 0
+                            if Fern.cstrcmp(train_data{j,obj.testList{k,1}},orderedStrings{1}) <= 0
                                 binaryNumber = binaryNumber + 2^(k-1);
                             end
                         end
@@ -101,7 +102,7 @@ classdef Fern
                     end
                 else
                     orderedStrings = sort({sample{obj.testList{k,1}};obj.testList{k,2}});
-                    if cstrcmp(sample{obj.testList{k,1}},orderedStrings{1}) <= 0
+                    if Fern.cstrcmp(sample{obj.testList{k,1}},orderedStrings{1}) <= 0
                         binaryNumber = binaryNumber + 2^(k-1);
                     end
                 end
@@ -126,8 +127,9 @@ classdef Fern
         end
     end
     
-    methods(Access=private)
-        function cmp = cstrcmp( a, b )
+    methods (Static = true)
+                
+        function cmp = cstrcmp(a, b )
             % The output is:
             %  a == b : 0
             %  a > b  : positive
@@ -146,6 +148,5 @@ classdef Fern
             end
         end
     end
-    
 end
 
