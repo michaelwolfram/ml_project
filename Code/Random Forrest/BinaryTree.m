@@ -19,13 +19,17 @@ classdef BinaryTree
         %                                           0=not used, 0.x..=used
         stoppingParams;
         
-        % Boolean tests of every node of the tree.
-        % (      test 1     | ... |     test n      )
+        % Properties of every node of the tree.
+        % (      node 1     | ... |     node n      )
         %
         %  -----------------------------------------
         % | feature index 1 | ... | feature index n |
         % |-----------------------------------------|
         % |   threshold 1   | ... |   threshold n   |
+        % |-----------------------------------------|
+        % |     isLeaf 1    | ... |    isLeaf n     |
+        % |-----------------------------------------|
+        % |   treeLayer 1   | ... |   treeLayer n   |
         %  -----------------------------------------
         %
         %                      1
@@ -34,14 +38,30 @@ classdef BinaryTree
         %                   / \ / \
         %                 ...  ... n
         allNodesList;
+        
+        % Cell array containing all leafs and their necessary properties.
         leafsList;
+        
+        % Adjacency matrix containing the actual structure of the tree.
         adjacencyMatrix;
     end
     
     methods
         % Constructor.
         function obj=BinaryTree(impurityMeasure, varargin)
-            obj.impurityMeasure = impurityMeasure;
+            if strcmp(impurityMeasure,'gini') ||...
+                    strcmp(impurityMeasure,'entropy') ||...
+                    strcmp(impurityMeasure,'misclassRate') ||...
+                    strcmp(impurityMeasure,'random')
+                obj.impurityMeasure = impurityMeasure;
+            else
+                error(['This is not a valid method for the'...
+                        ' measurement of impurity of a given'...
+                        ' distribution. Please provide either'...
+                        ' ''gini'', ''entropy'', ''misclassRate'','...
+                        ' ''random''.']);
+            end
+            
             argSize = size(varargin,2);
             if argSize==0
                 error('Specify at least one stopping heuristic.');
@@ -91,23 +111,54 @@ classdef BinaryTree
                 error('This tree is supposed to by trained with some kind of impurity measure like the Gini index.');
             end
             
-            
             obj.classes = unique(train_labels);
             
+            % In the list of splitted training data i specifies the
+            % currently treated node and the one to be treated next,
+            % respectively.
             i = 1;
+            % In the list of splitted training data j specifies the index
+            % of the most recently added node. Thus, the number of a new
+            % node to be added is j+1.
             j = 1;
+            
             treeHeight = 0;
             numLeafs = 0;
             abort = false;
             
+            % Initialize splitted training data with all training data and
+            % labels.
+            obj.splittedTrainingData{1,1} = train_data;
+            obj.splittedTrainingData{2,1} = train_labels;
+            classSize = size(obj.classes,1);
+            distribution = zeros(classSize,1);
+            for i=1:classSize
+                distribution(i) = numel(find(strcmp(train_labels,obj.classes{i})));
+            end
+            obj.splittedTrainingData{3,1} = distribution;
             
             while ~abort
-                currNode = obj.allNodesList(:,i);
-                currDistribution = obj.splittedTrainingData{4,i};
+                % Get distribution of the current node.
+                currDistribution = obj.splittedTrainingData{3,i};
                 
-%                 if() || () || (hier kann ich median(currDistribution)==0 && max(currDistribution)~=0)
-               if true
+                %%%% Stopping criterias to be tested before actually
+                %%%% splitting the node.
+                
+                % Check if the distribution of the current node is pure.
+                %
+                % Check if the maximum depth of the tree is reached via
+                % this node.
+                %
+                % Check if the number of data samples in this node is below
+                % a given threshold t_n.
+                %
+                % If one of these tests return true, mark this node as leaf
+                % and do some other stuff for saving a new leaf.
+               if (obj.stoppingParams.pure==true && max(currDistribution)==sum(currDistribution)) ||...
+                       (obj.stoppingParams.depth~=0 && obj.allNodesList(4,currNode)>=obj.stoppingParams.depth) ||...
+                       (obj.stoppingParams.numSamples~=0 && sum(currDistribution)<obj.stoppingParams.numSamples)
                    % Mark node as leaf
+                   
                    
                    % Create new entry in leafsList
                    numLeafs = numLeafs + 1;
@@ -125,6 +176,21 @@ classdef BinaryTree
                    i = i + 1;
                    continue
                end
+                
+                %%%% Stopping criterias to be tested after actually
+                %%%% splitting the node.
+                
+                % Check if the benefit of splitting is below a given
+                % threshold t_{delta}.
+                % If yes, mark this node as leaf
+                % and do some other stuff for saving a new leaf.
+                
+                if (obj.stoppingParams.pure==true && max(currDistribution)==sum(currDistribution)) ||...
+                       (obj.stoppingParams.depth~=0 && obj.allNodesList(4,currNode)>=obj.stoppingParams.depth)
+                
+                %%%% Actually splitting the node.
+                
+
                 
                 i = i + 1;
                 if i==j
@@ -160,25 +226,112 @@ classdef BinaryTree
                     end
                 end
             end
-            
         end
         
     end
     
     methods (Access=private)
-        function giniValue=gini(obj, currPartition)
-            partSize = size(currPartition);
+        function giniValue=gini(obj, currDistribution)
+            partSize = size(currDistribution);
             if partSize(1)~=1 || partSize(2)~=size(obj.classes,2)
                 error(['Size of currPartition does not match number of'...
                     'possible classes.']);
             end
-            s = sum(currPartition);
+            s = sum(currDistribution);
             if s == 0
-                giniValue = 1;
+                error(['This should not have happened. Please contact'...
+                    'your system administrator.']);
             else
-                giniValue = 1.0 - (sum(currPartition.*currPartition))...
-                    /(s*s*1.0);
+                pi = currDistribution / s;
+                giniValue = 1.0 - sum(pi.*pi);
             end
+        end
+        
+        function entropyValue=entropy(obj, currDistribution)
+            partSize = size(currDistribution);
+            if partSize(1)~=1 || partSize(2)~=size(obj.classes,2)
+                error(['Size of currPartition does not match number of'...
+                    'possible classes.']);
+            end
+            s = sum(currDistribution);
+            if s == 0
+                error(['This should not have happened. Please contact'...
+                    'your system administrator.']);
+            else
+                pi = currDistribution / s;
+                entropyValue = -sum(pi.*log(pi));
+            end
+        end
+        
+        function misclassRateValue=misclassRate(obj,currDistribution)
+            partSize = size(currDistribution);
+            if partSize(1)~=1 || partSize(2)~=size(obj.classes,2)
+                error(['Size of currPartition does not match number of'...
+                    'possible classes.']);
+            end
+            s = sum(currDistribution);
+            if s == 0
+                error(['This should not have happened. Please contact'...
+                    'your system administrator.']);
+            else
+                misclassRateValue = (s-max(currDistribution)) / s;
+            end
+        end
+        
+        function costz = costs(obj, distribution)
+            switch obj.impurityMeasure
+                case 'gini'
+                    costz = obj.gini(distribution);
+                case 'entropy'
+                    costz = obj.entropy(distribution);
+                case 'misclassRate'
+                    costz = obj.misclassRate(distribution);
+                otherwise
+                    error(['This is not a valid method for the'...
+                        ' measurement of impurity of a given'...
+                        ' distribution.']);
+            end
+        end
+        
+        function newCosts=calcNewCosts(obj,left,right)
+            l = sum(left);
+            r = sum(right);
+            all = l + r;
+            newCosts = (l*obj.costs(left) + r*obj.costs(right)) / all;
+        end
+        
+        function [left,right]=splitTreePi(obj,featureDimension,featureValue,train_data,train_labels)
+            classSize = size(obj.classes,1);
+            left = zeros(classSize,1);
+            right = zeros(classSize,1);
+            value = train_data(featureValue,featureDimension);
+            
+            l = train_labels(train_data(:,featureDimension)<=value);
+            r = train_labels(train_data(:,featureDimension)>value);
+            for i=1:classSize
+                left(i) = size(find(strcmp(l,obj.classes{i})),1);
+                right(i) = size(find(strcmp(r,obj.classes{i})),1);
+            end
+        end
+ 
+        function [featureDimension,featureValue,splitCosts]=findBestSplit(obj,train_data,train_labels)
+            curr_i = 0;
+            curr_j = 0;
+            curr_costs = inf;
+            for i=1:size(train_data,1)
+                for j=1:size(train_data,2)
+                    [left,right] = obj.splitTreePi(j,i,train_data,train_labels);
+                    tmp = obj.calcNewCosts(left,right);
+                    if tmp < curr_costs
+                        curr_i = i;
+                        curr_j = j;
+                        curr_costs = tmp;
+                    end
+                end
+            end
+            featureDimension = curr_j;
+            featureValue = curr_i;
+            splitCosts = curr_costs;
         end
     end
     
@@ -193,13 +346,6 @@ classdef BinaryTree
                 ' precision.']);
         end
         
-        function [newCosts]=calcNewCosts(left, right)
-            l = sum(left);
-            r = sum(right);
-            all = l + r;
-            newCosts = (l*obj.gini(left) + r*obj.gini(right)) / all;
-        end
-        
         function [left_data,left_labels,right_data,right_labels]=splitTreeData(featureDimension,featureValue,train_data,train_labels)
             value = train_data(featureValue,featureDimension);
             
@@ -209,40 +355,6 @@ classdef BinaryTree
             right_data = train_labels(r_indices);
             left_labels = train_labels(l_indices);
             right_labels = train_labels(r_indices);
-        end
-        
-        function [left,right]=splitTreePi(featureDimension,featureValue,train_data,train_labels)
-            classSize = size(obj.classes,1);
-            left = zeros(classSize,1);
-            right = zeros(classSize,1);
-            value = train_data(featureValue,featureDimension);
-            
-            l = train_labels(train_data(:,featureDimension)<=value);
-            r = train_labels(train_data(:,featureDimension)>value);
-            for i=1:classSize
-                left(i) = size(find(strcmp(l,obj.classes{i})),1);
-                right(i) = size(find(strcmp(r,obj.classes{i})),1);
-            end
-        end
- 
-        function [featureDimension,featureValue,splitCosts]=findBestSplit(train_data,train_labels)
-            curr_i = 0;
-            curr_j = 0;
-            curr_costs = inf;
-            for i=1:size(train_data,1)
-                for j=1:size(train_data,2)
-                    [left,right] = splitTreePi(j,i,train_data,train_labels);
-                    tmp = calcNewCosts(left,right);
-                    if tmp < curr_costs
-                        curr_i = i;
-                        curr_j = j;
-                        curr_costs = tmp;
-                    end
-                end
-            end
-            featureDimension = curr_j;
-            featureValue = curr_i;
-            splitCosts = curr_costs;
         end
         
     end
