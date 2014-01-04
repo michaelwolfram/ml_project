@@ -3,6 +3,8 @@ classdef Fern
     %   Detailed explanation goes here
     
     properties
+        numTests;
+        
         % a two-column wide column vector that contains the dimension at
         % which we split and the respective value
         testList;
@@ -11,26 +13,28 @@ classdef Fern
     end
     
     methods
-        function obj = Fern()
-            obj.testList = {};
-            obj.histograms = [];
+        function obj = Fern(numTests)
+            obj.testList = cell(numTests, 2);
+            obj.histograms = zeros(5,2^numTests);
+            obj.numTests = numTests;
         end
         
-        function obj = trainRandom(obj, train_data, train_labels, min_data, max_data, numTests)
+        function obj = trainRandom(obj, train_data, ...
+                train_labels, min_data, max_data)
             % training for a single fern
             
-            obj.testList = cell(numTests, 2);
+            
             numSamples = size(train_data,1);
             numFeatures = size(train_data,2);
             [obj.classes,indices,~]=unique(train_labels);
             numClasses = size(obj.classes,1);
             indices(numClasses+1) = numSamples+1;
             
-            randNumbers = rand([2,numTests]);
+            randNumbers = rand([2,obj.numTests]);
             % necessary to generate random letter within min/max range
             smallAlphabet = 'defghijklmnopqrstuvw';
             
-            for i = 1:numTests
+            for i = 1:obj.numTests
                 randomFeature = round(1 + ((numFeatures-1) * ...
                     randNumbers(1,i)));
                 obj.testList{i,1} = randomFeature;
@@ -51,15 +55,14 @@ classdef Fern
                 end
             end
             
-            % we have ones instead of zeros here
-            obj.histograms = zeros(5,2^numTests);
+            
             for i = 1:numClasses
                 for j = indices(i):(indices(i+1)-1)
                     binaryNumber = 1;
                     
                     % add cases for string comparisons
                     
-                    for k = 1:numTests
+                    for k = 1:obj.numTests
                         if ~ischar(train_data{j,obj.testList{k,1}})
                             if train_data{j,obj.testList{k,1}} <= obj.testList{k,2}
                                 binaryNumber = binaryNumber + 2^(k-1);
@@ -76,9 +79,9 @@ classdef Fern
                         obj.histograms(i,binaryNumber) + 1;
                 end
                 % normalize the histogram to get an actual probability
-                for l = 1:(2^numTests)
+                for l = 1:(2^obj.numTests)
                     obj.histograms(i,l) = (obj.histograms(i,l) + 1) / ...
-                        (indices(i+1)-indices(i) + (2^numTests));
+                        (indices(i+1)-indices(i) + (2^obj.numTests));
                 end
             end
         end
@@ -87,12 +90,11 @@ classdef Fern
         
         function [class, posterior] = evaluate(obj, sample)
             % evaluate a single fern
-            numTests=size(obj.testList(:,1));
             
             %create binary number
             binaryNumber = 1;
             
-            for k = 1:numTests
+            for k = 1:obj.numTests
                 if ~ischar(sample{obj.testList{k,1}})
                     if sample{obj.testList{k,1}} <= obj.testList{k,2}
                         binaryNumber = binaryNumber + 2^(k-1);
@@ -116,10 +118,10 @@ classdef Fern
                 posterior(i)= obj.histograms(i,binaryNumber) / ...
                     sumClassProbability;
             end
-            posterior
+            %display(posterior)
             
             [~, classNumber] = max(posterior);
-            class = obj.classes(classNumber)
+            class = obj.classes(classNumber);
             
         end
     end
