@@ -1,9 +1,13 @@
 %% Ferest Tests
-maxDepth = 4;
-maxFerns = 2;
+maxDepth = 20;
+maxFerns = 50;
 
-ferests = cell(maxFerns,maxDepth);
 accuracies = zeros(maxFerns,maxDepth);
+
+startFerestsString = 'Evaluation/Ferests/ferest';
+startAccuraciesString = 'Evaluation/Accuracies/accuracy';
+matEnd = '.mat';
+
 
 try
     for i = 1:maxDepth
@@ -11,13 +15,18 @@ try
         
         for k = 1:maxFerns
             numFerns = k;
-            ferests{k,i} = Ferest(numFerns, numTests);
-            ferests{k,i} = ferests{k,i}.trainRandom(train_data, train_labels);
+            ferest = Ferest(numFerns, numTests);
+            ferest = ferest.trainRandom(train_data, train_labels);
+            
+            saveString = strcat(startFerestsString,'_',num2str(i), ...
+                '_',num2str(j),matEnd);
+            save(saveString,'ferest','-v7.3');
+            
             
             accuracy = [0, 0];
             for j = 1:size(valid_data,1)
                 sample = valid_data(j,:);
-                [class, ~] = ferests{k,i}.evaluate(sample);
+                [class, ~] = ferest.evaluate(sample);
                 if strcmp(class,valid_labels{j}) == 1
                     accuracy(1) = accuracy(1)+1;
                 else
@@ -25,10 +34,24 @@ try
                 end
             end
             accuracy = accuracy/sum(accuracy);
+            
+            saveString = strcat(startAccuraciesString,'_',num2str(i), ...
+                '_',num2str(j),matEnd);
+            save(saveString,'accuracy','-v7.3');
+            
             accuracies(k,i) = accuracy(1);
         end
+        
+        saveString = strcat(startAccuraciesString,'_',num2str(i), ...
+            '_',num2str(j),matEnd);
+        save(saveString,'accuracies','-v7.3');
     end
 catch
-    save('Evaluation/ferestsMaxMax.mat','ferests')
-    save('Evaluation/accuraciesMaxMax.mat','accuracies')
+    saveString = strcat(startAccuraciesString,'_',num2str(i), ...
+        '_',num2str(j),matEnd);
+    save(saveString,'accuracies','-v7.3');
 end
+
+saveString = strcat(startAccuraciesString,'_',num2str(i), ...
+    '_',num2str(j),matEnd);
+save(saveString,'accuracies','-v7.3');
