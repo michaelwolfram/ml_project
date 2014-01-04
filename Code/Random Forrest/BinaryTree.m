@@ -39,6 +39,9 @@ classdef BinaryTree
         %                 ...  ... n
         allNodesList;
         
+        % List of all open nodes.
+        splittedTrainingData;
+        
         % Cell array containing all leafs and their necessary properties.
         leafsList;
         
@@ -132,8 +135,8 @@ classdef BinaryTree
             obj.splittedTrainingData{2,1} = train_labels;
             classSize = size(obj.classes,1);
             distribution = zeros(classSize,1);
-            for i=1:classSize
-                distribution(i) = numel(find(strcmp(train_labels,obj.classes{i})));
+            for k=1:classSize
+                distribution(k) = numel(find(strcmp(train_labels,obj.classes{k})));
             end
             obj.splittedTrainingData{3,1} = distribution;
             
@@ -141,7 +144,7 @@ classdef BinaryTree
             obj.allNodesList = [0; 0; false; treeHeight];
             
             % Initialize adjacency matrix.
-            obj.adjacencyMatriy = sparse(1,1);
+            obj.adjacencyMatrix = sparse(1,1);
             
             while ~abort
                 % Get distribution of the current node.
@@ -164,7 +167,7 @@ classdef BinaryTree
                 if (obj.stoppingParams.pure==true...
                         && max(currDistribution)==sum(currDistribution)) ||...
                         (obj.stoppingParams.depth~=0 ...
-                        && obj.allNodesList(4,currNode)>=obj.stoppingParams.depth) ||...
+                        && obj.allNodesList(4,i)>=obj.stoppingParams.depth) ||...
                         (obj.stoppingParams.numSamples~=0 ...
                         && sum(currDistribution)<obj.stoppingParams.numSamples)
                     markAsLeaf = true;
@@ -177,8 +180,8 @@ classdef BinaryTree
                 % threshold t_{delta}.
                 % If yes, mark this node as leaf and do some other
                 % stuff for saving a new leaf.
-                currData = obj.splittedTrainingData{3,i};
-                currLabels = obj.splittedTrainingData{3,i};
+                currData = obj.splittedTrainingData{1,i};
+                currLabels = obj.splittedTrainingData{2,i};
                 [featureDimension,featureValue,splitCosts] =...
                     obj.findBestSplit(currData,currLabels);
                 
@@ -248,6 +251,11 @@ classdef BinaryTree
                     % added node.
                     i = i + 1;
                     j = j + 2;
+                    
+                    % Finally, delete entry in splittedTrainingData
+                    obj.splittedTrainingData{1,i} = [];
+                    obj.splittedTrainingData{2,i} = [];
+                    obj.splittedTrainingData{3,i} = [];
                 end
             end
         end
@@ -284,14 +292,14 @@ classdef BinaryTree
     methods (Access=private)
         function giniValue=gini(obj, currDistribution)
             partSize = size(currDistribution);
-            if partSize(1)~=1 || partSize(2)~=size(obj.classes,2)
+            if partSize(2)~=1 || partSize(1)~=size(obj.classes,1)
                 error(['Size of currPartition does not match number of'...
-                    'possible classes.']);
+                    ' possible classes.']);
             end
             s = sum(currDistribution);
             if s == 0
                 error(['This should not have happened. Please contact'...
-                    'your system administrator.']);
+                    ' your system administrator.']);
             else
                 pi = currDistribution / s;
                 giniValue = 1.0 - sum(pi.*pi);
@@ -300,14 +308,14 @@ classdef BinaryTree
         
         function entropyValue=entropy(obj, currDistribution)
             partSize = size(currDistribution);
-            if partSize(1)~=1 || partSize(2)~=size(obj.classes,2)
+            if partSize(2)~=1 || partSize(1)~=size(obj.classes,1)
                 error(['Size of currPartition does not match number of'...
-                    'possible classes.']);
+                    ' possible classes.']);
             end
             s = sum(currDistribution);
             if s == 0
                 error(['This should not have happened. Please contact'...
-                    'your system administrator.']);
+                    ' your system administrator.']);
             else
                 pi = currDistribution / s;
                 entropyValue = -sum(pi.*log(pi));
@@ -316,14 +324,14 @@ classdef BinaryTree
         
         function misclassRateValue=misclassRate(obj,currDistribution)
             partSize = size(currDistribution);
-            if partSize(1)~=1 || partSize(2)~=size(obj.classes,2)
+            if partSize(2)~=1 || partSize(1)~=size(obj.classes,1)
                 error(['Size of currPartition does not match number of'...
-                    'possible classes.']);
+                    ' possible classes.']);
             end
             s = sum(currDistribution);
             if s == 0
                 error(['This should not have happened. Please contact'...
-                    'your system administrator.']);
+                    ' your system administrator.']);
             else
                 misclassRateValue = (s-max(currDistribution)) / s;
             end
@@ -345,20 +353,35 @@ classdef BinaryTree
         end
         
         function newCosts=calcNewCosts(obj,left,right)
-            l = sum(left);
-            r = sum(right);
-            all = l + r;
-            newCosts = (l*obj.costs(left) + r*obj.costs(right)) / all;
+            if sum(left)==0 || sum(right)==0
+                newCosts = inf;
+            else
+                l = sum(left);
+                r = sum(right);
+                all = l + r;
+                newCosts = (l*obj.costs(left) + r*obj.costs(right)) / all; 
+            end
         end
         
         function [left,right]=splitTreePi(obj,featureDimension,featureValue,train_data,train_labels)
             classSize = size(obj.classes,1);
             left = zeros(classSize,1);
             right = zeros(classSize,1);
-            value = train_data(featureValue,featureDimension);
+            value = train_data{featureValue,featureDimension};
             
-            l = train_labels(train_data(:,featureDimension)<=value);
-            r = train_labels(train_data(:,featureDimension)>value);
+            if featureDimension <= 2
+                a = cellfun(@(x) BinaryTree.cstrcmp(x,value),train_data(:,featureDimension))<=0;
+                l = train_labels(a);
+                b = cellfun(@(x) BinaryTree.cstrcmp(x,value),train_data(:,featureDimension))>0;
+                r = train_labels(b);
+            else
+                a = cellfun(@(x) (x<=value),train_data(:,featureDimension));
+                l = train_labels(a);
+                b = cellfun(@(x) (x>value),train_data(:,featureDimension));
+                r = train_labels(b);
+%                 l = train_labels(train_data{:,featureDimension}<=value);
+%                 r = train_labels(train_data{:,featureDimension}>value);
+            end
             for i=1:classSize
                 left(i) = size(find(strcmp(l,obj.classes{i})),1);
                 right(i) = size(find(strcmp(r,obj.classes{i})),1);
@@ -386,7 +409,7 @@ classdef BinaryTree
         end
     end
     
-    methods (Access=private, Static=true)
+    methods (Access=public, Static=true)
         function printVararginErrorMsg()
             error(['Please provide the stopping heuristics in pairs'...
                 ' in the following way: <X,Y> where X is one of ''p'''...
@@ -400,10 +423,10 @@ classdef BinaryTree
         function [left_data,left_labels,left_distribution,...
                 right_data,right_labels,right_distribution]=...
                 splitTreeData(featureDimension,featureValue,train_data,train_labels)
-            value = train_data(featureValue,featureDimension);
+            value = train_data{featureValue,featureDimension};
             
-            l_indices = train_data(:,featureDimension)<=value;
-            r_indices = train_data(:,featureDimension)>value;
+            l_indices = train_data{:,featureDimension}<=value;
+            r_indices = train_data{:,featureDimension}>value;
             left_data = train_data(l_indices);
             right_data = train_data(r_indices);
             left_labels = train_labels(l_indices);
@@ -412,11 +435,32 @@ classdef BinaryTree
             classSize = size(obj.classes,1);
             left_distribution = zeros(classSize,1);
             right_distribution = zeros(classSize,1);
+            l = train_labels{l_indices};
+            r = train_labels{r_indices};
             for i=1:classSize
                 left_distribution(i) =...
-                    size(find(strcmp(left_labels,obj.classes{i})),1);
+                    size(find(strcmp(l,obj.classes{i})),1);
                 right_distribution(i) =...
-                    size(find(strcmp(right_labels,obj.classes{i})),1);
+                    size(find(strcmp(r,obj.classes{i})),1);
+            end
+        end
+        
+        function cmp = cstrcmp( a, b )
+            % The output is:
+            %  a == b : 0
+            %  a > b  : positive
+            %  a < b  : negative
+            
+            % Force the strings to equal length
+            x = char({a;b});
+            % Subtract one from the other
+            d = x(1,:) - x(2,:);
+            % Remove zero entries
+            d(~d) = [];
+            if isempty(d)
+                cmp = 0;
+            else
+                cmp = d(1);
             end
         end
         
