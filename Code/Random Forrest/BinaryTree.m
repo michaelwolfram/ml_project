@@ -3,12 +3,22 @@ classdef BinaryTree
     %   Detailed explanation goes here
     
     properties
-        % Depth of this tree.
-        depth;
-        % All possible classes. 
+        % All possible classes.
         classes;
+        
         % Used impurity measure of this tree.
         impurityMeasure;
+        
+        % Parameters for all stopping heuristics:
+        %   * 'p' - distribution in branch is pure: [true|false]
+        %   * 'd' - maximum depth reached:          0=not used, 1..=used
+        %   * 's' - number of samples in each branch below certain
+        %           threshold t_n:                  0=not used, 0.x..=used
+        %   * 'b' - benefit of splitting is below certain threshold
+        %           cost(D) - [pi_L*cost(D_L)+pi_R*cost(D_R)] < t_{delta}:
+        %                                           0=not used, 0.x..=used
+        stoppingParams;
+        
         % Boolean tests of every node of the tree.
         % (      test 1     | ... |     test n      )
         %
@@ -28,275 +38,165 @@ classdef BinaryTree
     
     methods
         % Constructor.
-        function obj=BinaryTree(depth, classes, impurityMeasure, varargin)
-            obj.depth = depth;
-            obj.classes = classes;
+        function obj=BinaryTree(impurityMeasure, varargin)
             obj.impurityMeasure = impurityMeasure;
-            argSize = size(varargin)
-            varargin
-        end
-        
-        % Train a tree with some training data
-        function obj=train(obj, trainingData)
-            %%This is not wrong but also not right though. classifiers will
-            %%be an array of feature attributes. Therefore, we must do
-            %%things like obj.featuresAttributes(i,j) = ...
-            
-            % extract necessary information
-            r = classifiers(1,:);
-            c = classifiers(2,:);
-            winWidth = classifiers(3,:);
-            winHeight = classifiers(4,:);
-            type = classifiers(5,:);
-            obj.featuresType = type;
-            obj.featuresAttributes = classifiers(6:end,:);
-            
-            % extract or build positions for rectangles with corners
-            % [m1, n1, m2, n2; ...] m = row, n = column
-            obj.numFeatures=size(classifiers,2);
-            for i=1:obj.numFeatures
-                r_i = r(i);
-                c_i = c(i);
-                winWidth_i = winWidth(i);
-                winHeight_i = winHeight(i);
-                
-                switch (type(i))
-                    case 1
-                        obj.featuresPositions{i} = ...
-                            [r_i c_i (r_i+winHeight_i-1) (c_i+ceil(winWidth_i/2)-1); ...
-                            r_i (c_i+ceil(winWidth_i/2)) (r_i+winHeight_i-1) (c_i+winWidth_i-1)];
-                        
-                    case 2
-                        obj.featuresPositions{i} = ...
-                            [r_i c_i (r_i+ceil(winHeight_i/2)-1) (c_i+winWidth_i-1); ...
-                            (r_i+ceil(winHeight_i/2)) c_i (r_i+winHeight_i-1) (c_i+winWidth_i-1)];
-                        
-                    case 3
-                        obj.featuresPositions{i} = ...
-                            [r_i c_i (r_i+winHeight_i-1) ceil(c_i+(winWidth_i/3)-1); ...
-                            r_i ceil(c_i+(winWidth_i/3)) (r_i+winHeight_i-1) ceil(c_i+(2*winWidth_i/3)-1); ...
-                            r_i ceil(c_i+(2*winWidth_i/3)) (r_i+winHeight_i-1) (c_i+winWidth_i-1)];
-                        
-                    case 4
-                        obj.featuresPositions{i} = ...
-                            [r_i c_i ceil(r_i+(winHeight_i/3)-1) (c_i+winWidth_i-1); ...
-                            ceil(r_i+(winHeight_i/3)) c_i ceil(r_i+(2*winHeight_i/3)-1) (c_i+winWidth_i-1); ...
-                            ceil(r_i+(2*winHeight_i/3)) c_i (r_i+winHeight_i-1) (c_i+winWidth_i-1)];
-                        
-                    case 5
-                        obj.featuresPositions{i} = ...
-                            [r_i c_i (r_i+ceil(winHeight_i/2)-1) (c_i+ceil(winWidth_i/2)-1); ...
-                            r_i (c_i+ceil(winWidth_i/2)) (r_i+ceil(winHeight_i/2)-1) (c_i+winWidth_i-1); ...
-                            (r_i+ceil(winHeight_i/2)) c_i (r_i+winHeight_i-1) (c_i+ceil(winWidth_i/2)-1); ...
-                            (r_i+ceil(winHeight_i/2)) (c_i+ceil(winWidth_i/2)) (r_i+winHeight_i-1) (c_i+winWidth_i-1)];
+            argSize = size(varargin,2);
+            if argSize==0
+                error('Specify at least one stopping heuristic.');
+            elseif mod(argSize,2)==1
+                obj.printVararginErrorMsg();
+            end
+            obj.stoppingParams = struct('pure','false','depth',0,...
+                'numSamples',0,'benefit',0);
+            for i=1:(argSize/2)
+                j = i*2-1;
+                switch varargin{j}
+                    case 'p'
+                        obj.stoppingParams.pure = varargin{j+1};
+                    case 'd'
+                        obj.stoppingParams.depth = varargin{j+1};
+                    case 's'
+                        obj.stoppingParams.numSamples = varargin{j+1};
+                    case 'b'
+                        obj.stoppingParams.benefit = varargin{j+1};
+                    otherwise
+                        obj.printVararginErrorMsg();
                 end
             end
+        end
+        
+        % Train a tree with some training data by randomly selecting
+        % the features as well as the thresholds at each decision node.
+        function obj=trainRandom(obj, train_data, train_labels)
+            % When initializing a tree a impurity measure method must be
+            % specified. Therefore, the consistency of the used method
+            % should be checked here.
+            if ~strcmp(obj.impurityMeasure,'random')
+                error('This tree is supposed to by trained with the random method.');
+            end
+            
+            obj.classes = unique(train_labels);
+            
+        end
+        
+        % Train a tree with some training data using some impurity measure
+        % like the Gini index.
+        function obj=trainImpurityMeasure(obj, train_data, train_labels)
+            % When initializing a tree a impurity measure method must be
+            % specified. Therefore, the consistency of the used method
+            % should be checked here.
+            if strcmp(obj.impurityMeasure,'random')
+                error('This tree is supposed to by trained with some kind of impurity measure like the Gini index.');
+            end
+            
+            
+            obj.classes = unique(train_labels);
+            
         end
         
         % computes the feature values for the given patch (from integral image)
-        function classification = Classify(obj, featureVector)
-            % so here we already initialized the HaarFeatures object with
-            % the featured extracted from Classifiers.mat. Therefore, we
-            % now want to extract these features in the given image patch.
-            % Thus, all the members of this class need to be matrices
-            % containing the necessary information for EVERY single
-            % feature.
+        function classification = classify(obj, featureVector)
+            % Boolean tests of every node of the tree.
+            % (      test 1     | ... |     test n      )
+            %
+            %  -----------------------------------------
+            % | feature index 1 | ... | feature index n |
+            % |-----------------------------------------|
+            % |   threshold 1   | ... |   threshold n   |
+            %  -----------------------------------------
+            %
+            %                      1
+            %                     / \
+            %                    2   3
+            %                   / \ / \
+            %                 ...  ... n
             
-            featureResponses = zeros(1,obj.numFeatures);
-            returnValues = zeros(1,obj.numFeatures);
+            %TODO how to handle not "full" tree!?
             
-            for i = 1:obj.numFeatures
-                
-                % for faster access:
-                FP = obj.featuresPositions{i};
-                FP = ceil(FP.*s);
-                FA = obj.featuresAttributes(:,i);
-                %%%%%%%%
-                % IS IT NECESSARY SO SCALE THESE FOUR VALUES, TOO!?!?
-                %%%%%%%%
-                mean = FA(1);
-                maxPos = FA(3);
-                minPos = FA(4);
-                R = FA(5);
-                %%%%%%%%
-                
-                %
-                %      c1      c2      c3
-                %
-                % r1    -----------------
-                %       |       |       |
-                %       |       |       |
-                % r2    |---------------|
-                %       |       |       |
-                %       |       |       |
-                % r3    -----------------
-                %
-                
-                switch (obj.featuresType(i))
-                    case 1
-                        %           B C
-                        %  A ----------------- D
-                        %    |       |       |
-                        %    |       |       |
-                        %    |       |       |
-                        %    |       |       |
-                        %    |       |       |
-                        %  E ----------------- H
-                        %           F G
-                        %
-                        % result = rect1+rect2 = (F-E-B+A) + (H-G-D+C)
-                        
-                        A = patch(FP(1,1),FP(1,2));
-                        B = patch(FP(1,1),FP(1,4));
-                        C = patch(FP(2,1),FP(2,2));
-                        D = patch(FP(2,1),FP(2,4));
-                        E = patch(FP(1,3),FP(1,1));
-                        F = patch(FP(1,3),FP(1,4));
-                        G = patch(FP(2,3),FP(2,2));
-                        H = patch(FP(2,3),FP(2,4));
-                        
-                        featureResponses(i) = (F-E-B+A) + (H-G-D+C); % :D
-                        
-                    case 2
-                        %
-                        %  A ----------------- B
-                        %    |               |
-                        %  C |               | D
-                        %    |---------------|
-                        %  E |               | F
-                        %    |               |
-                        %  G ----------------- H
-                        %
-                        % result = rect1+rect2 = (D-C-B+A) + (H-G-F+E)
-                        
-                        A = patch(FP(1,1),FP(1,2));
-                        B = patch(FP(1,1),FP(1,4));
-                        C = patch(FP(1,3),FP(1,2));
-                        D = patch(FP(1,3),FP(1,4));
-                        E = patch(FP(2,1),FP(2,2));
-                        F = patch(FP(2,1),FP(2,4));
-                        G = patch(FP(2,3),FP(2,2));
-                        H = patch(FP(2,3),FP(2,4));
-                        
-                        featureResponses(i) = (D-C-B+A) + (H-G-F+E); % :D
-                        
-                    case 3
-                        
-                        %           B C     D E
-                        %  A ------------------------- F
-                        %    |       |       |       |
-                        %    |       |       |       |
-                        %    |       |       |       |
-                        %    |       |       |       |
-                        %    |       |       |       |
-                        %    |       |       |       |
-                        %    |       |       |       |
-                        %    |       |       |       |
-                        %  G ------------------------- L
-                        %           H I     J K
-                        %
-                        % result = rect1-rect2+rect3 = (H-G-B+A) - (J-I-D+C) + (L-K-F+E)
-                        
-                        A = patch(FP(1,1),FP(1,2));
-                        B = patch(FP(1,1),FP(1,4));
-                        G = patch(FP(1,3),FP(1,2));
-                        H = patch(FP(1,3),FP(1,4));
-                        C = patch(FP(2,1),FP(2,2));
-                        D = patch(FP(2,1),FP(2,4));
-                        I = patch(FP(2,3),FP(2,2));
-                        J = patch(FP(2,3),FP(2,4));
-                        E = patch(FP(3,1),FP(3,2));
-                        F = patch(FP(3,1),FP(3,4));
-                        K = patch(FP(3,3),FP(3,2));
-                        L = patch(FP(3,3),FP(3,4));
-                        
-                        featureResponses(i) = ...
-                            (H-G-B+A) - (J-I-D+C) + (L-K-F+E);
-                        
-                    case 4
-                        
-                        %
-                        %
-                        %  A ------------------------- B
-                        %    |                       |
-                        %  C |                       | D
-                        %    |-----------------------|
-                        %  E |                       | F
-                        %  G |                       | H
-                        %    |-----------------------|
-                        %  I |                       | J
-                        %    |                       |
-                        %  K ------------------------- L
-                        %
-                        % result = rect1-rect2+rect3 =
-                        %        = (D-C-B+A) - (H-G-F+E) + (L-K-J+I)
-                        
-                        
-                        A = patch(FP(1,1),FP(1,2));
-                        B = patch(FP(1,1),FP(1,4));
-                        C = patch(FP(1,3),FP(1,2));
-                        D = patch(FP(1,3),FP(1,4));
-                        E = patch(FP(2,1),FP(2,2));
-                        F = patch(FP(2,1),FP(2,4));
-                        G = patch(FP(2,3),FP(2,2));
-                        H = patch(FP(2,3),FP(2,4));
-                        I = patch(FP(3,1),FP(3,2));
-                        J = patch(FP(3,1),FP(3,4));
-                        K = patch(FP(3,3),FP(3,2));
-                        L = patch(FP(3,3),FP(3,4));
-                        
-                        featureResponses(i) = ...
-                            (D-C-B+A) - (H-G-F+E) + (L-K-J+I);
-                        
-                    case 5
-                        %          B   E
-                        %  A ----------------- F
-                        %    |  1    |    2  |
-                        %  C |     D | G     | H
-                        %    |---------------|
-                        %  I |     J | M     | N
-                        %    |  3    |    4  |
-                        %  K ----------------- P
-                        %          L   O
-                        % result = rect1-rect2+rect3-rect4 =
-                        %        = (D-C-B+A) - (H-G-F+E) ...
-                        %           + (L-K-J+I) - (P-O-N+M)
-                        
-                        A = patch(FP(1,1),FP(1,2));
-                        B = patch(FP(1,1),FP(1,4));
-                        C = patch(FP(1,3),FP(1,2));
-                        D = patch(FP(1,3),FP(1,4));
-                        E = patch(FP(2,1),FP(2,2));
-                        F = patch(FP(2,1),FP(2,4));
-                        G = patch(FP(2,3),FP(2,2));
-                        H = patch(FP(2,3),FP(2,4));
-                        I = patch(FP(3,1),FP(3,2));
-                        J = patch(FP(3,1),FP(3,4));
-                        K = patch(FP(3,3),FP(3,2));
-                        L = patch(FP(3,3),FP(3,4));
-                        M = patch(FP(4,1),FP(4,2));
-                        N = patch(FP(4,1),FP(4,4));
-                        O = patch(FP(4,3),FP(4,2));
-                        P = patch(FP(4,3),FP(4,4));
-                        
-                        featureResponses(i) = ...
-                            (D-C-B+A) - (H-G-F+E) + (L-K-J+I) - (P-O-N+M);
-                end
-                % assign actual output (+/- or face/non-face)
-                
-                t = featureResponses(i);
-                if (t <= (mean+abs(maxPos-mean)*(R-5)/50) && ...
-                        t >= (mean-abs(mean-minPos)*(R-5)/50))
-                    returnValues(i) = -1;
-                else
-                    returnValues(i) = 1;
-                end
-            end
-            % print result ;D
-            %             display(returnValues)
         end
         
     end
     
-end
+    methods (Access=private)
+        function giniValue=gini(obj, currPartition)
+            partSize = size(currPartition);
+            if partSize(1)~=1 || partSize(2)~=size(obj.classes,2)
+                error(['Size of currPartition does not match number of'...
+                    'possible classes.']);
+            end
+            s = sum(currPartition);
+            if s == 0
+                giniValue = 1;
+            else
+                giniValue = 1.0 - (sum(currPartition.*currPartition))...
+                    /(s*s*1.0);
+            end
+        end
+    end
+    
+    methods (Access=private, Static=true)
+        function printVararginErrorMsg()
+            error(['Please provide the stopping heuristics in pairs'...
+                ' in the following way: <X,Y> where X is one of ''p'''...
+                ' (pure branch), ''d''(maximum depth), ''s''(number of'...
+                ' samples) or ''b''(benefit of splitting) and Y is'...
+                ' [''true''|''false''], an integer value, a threshold'...
+                ' in integer precision or a threshold in double'...
+                ' precision.']);
+        end
+        
+        function [newCosts]=calcNewCosts(left, right)
+            l = sum(left);
+            r = sum(right);
+            all = l + r;
+            newCosts = (l*obj.gini(left) + r*obj.gini(right)) / all;
+        end
+        
+        function [left,right]=splitTree(row,col,train_data,train_labels)
+            classSize = size(obj.classes,1);
+            left = zeros(classSize,1);
+            right = zeros(classSize,1);
+            value = train_data(row,col);
+            
+            l = train_data(train_data(:,col)<=value);
+            r = train_data(train_data(:,col)>value);
+            for i=1:classSize
+                left(i) = size(find(strcmp(l,obj.classes{i})),1);
+                right(i) = size(find(strcmp(r,obj.classes{i})),1);
+            end
+            % Should work, too, but should be slower.
+%             for i=1:size(train_data,1)
+%                 classIndex = find(strcmp(obj.classes,train_labels(i,1)));
+%                 if size(classIndex,1)~=1 || size(classIndex,2)~=1
+%                     error('Occurence of one class is greater than 1.');
+%                 end
+%                 if train_data(i,col) <= value
+%                     left(classIndex) = left(classIndex) + 1;
+%                 else
+%                     right(classIndex) = right(classIndex) + 1;
+%                 end
+%             end
+        end
 
+        function [featureDimension,featureValue,splitCosts]=findBestSplit(train_data,train_labels)
+            curr_i = 0;
+            curr_j = 0;
+            curr_costs = 99999999;
+            for i=1:size(train_data,1)
+                for j=1:size(train_data,2)
+                    [left,right] = splitTree(i,j,train_data,train_labels);
+                    tmp = calcNewCosts(left,right);
+                    if tmp < curr_costs
+                        curr_i = i;
+                        curr_j = j;
+                        curr_costs = tmp;
+                    end
+                end
+            end
+            featureDimension = curr_j;
+            featureValue = curr_i;
+            splitCosts = curr_costs;
+        end
+        
+    end
+end

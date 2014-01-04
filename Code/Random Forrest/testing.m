@@ -1,1 +1,1 @@
-bT = BinaryTree(8,['a','b','c'],'Gini',1,2,'penis',[1,2,3]);
+bT = BinaryTree(['a','b','c'],'random','p','true','d',10);
