@@ -33,12 +33,12 @@ classdef Ferest
             max_data(3:18) = max(cell2mat(train_data(:,3:18)));
             
             for i = 1:obj.numFerns
-                tic
+                % tic
                 obj.fernList{i} = obj.fernList{i}. ...
                     trainRandom(train_data, train_labels, ...
                     min_data, max_data);
-                display('Elapsed time for the training of one FERN:')
-                toc
+                % display('Elapsed time for the training of one FERN:')
+                % toc
                 obj.testLists{i} = obj.fernList{i}.testList;
                 obj.histogramList{i} = obj.fernList{i}.histograms;
             end
