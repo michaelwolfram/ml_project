@@ -33,7 +33,9 @@ classdef BinaryTree
         %                    2   3
         %                   / \ / \
         %                 ...  ... n
-        boolTests;
+        allNodesList;
+        leafsList;
+        adjacencyMatrix;
     end
     
     methods
@@ -92,26 +94,72 @@ classdef BinaryTree
             
             obj.classes = unique(train_labels);
             
+            i = 1;
+            j = 1;
+            treeHeight = 0;
+            numLeafs = 0;
+            abort = false;
+            
+            
+            while ~abort
+                currNode = obj.allNodesList(:,i);
+                currDistribution = obj.splittedTrainingData{4,i};
+                
+%                 if() || () || (hier kann ich median(currDistribution)==0 && max(currDistribution)~=0)
+               if true
+                   % Mark node as leaf
+                   
+                   % Create new entry in leafsList
+                   numLeafs = numLeafs + 1;
+                   obj.leafsList{1,numLeafs} = i;
+                   obj.leafsList{2,numLeafs} =...
+                       obj.classes{...
+                       find(currDistribution==max(currDistribution),1)};
+                   obj.leafsList{3,numLeafs} = currDistribution;
+                   
+                   % Delete entry in splittedTrainingData
+                   obj.splittedTrainingData{1,i} = [];
+                   obj.splittedTrainingData{2,i} = [];
+                   
+                   % Continue with next node.
+                   i = i + 1;
+                   continue
+               end
+                
+                i = i + 1;
+                if i==j
+                    abort = true;
+                end
+            end
+ 
+            
         end
         
-        % computes the feature values for the given patch (from integral image)
-        function classification = classify(obj, featureVector)
-            % Boolean tests of every node of the tree.
-            % (      test 1     | ... |     test n      )
-            %
-            %  -----------------------------------------
-            % | feature index 1 | ... | feature index n |
-            % |-----------------------------------------|
-            % |   threshold 1   | ... |   threshold n   |
-            %  -----------------------------------------
-            %
-            %                      1
-            %                     / \
-            %                    2   3
-            %                   / \ / \
-            %                 ...  ... n
+        % Classify a new data point given its feature vector.
+        function [classification,classCertainty] = classify(obj, featureVector)
+            classification = '';
             
-            %TODO how to handle not "full" tree!?
+            % Select root at start node.
+            currNode = 1;
+            while isempty(classification)
+                if obj.allNodesList(3,currNode) == true
+                    % This node is a leaf. Classify and exit.
+                    index = find(obj.leafsList{1,:}==currNode,1);
+                    classification = obj.leafsList{2,index};
+                    distribution = obj.leafsList{3,index};
+                    classCertainty = max(distribution) / sum(distribution);
+                else
+                    % This node is a inner node. Select correct child.
+                    [~, children] = find(obj.adjacencyMatrix(currNode,:)==1,2);
+                    if featureVector(obj.allNodesList(1,currNode)) <= obj.allNodesList(2,currNode)
+                        % Select left child.
+                        currNode = children(1);
+                    else
+                        % Select right child.
+                        currNode = children(2);
+                    end
+                end
+            end
             
         end
         
@@ -152,39 +200,38 @@ classdef BinaryTree
             newCosts = (l*obj.gini(left) + r*obj.gini(right)) / all;
         end
         
-        function [left,right]=splitTree(row,col,train_data,train_labels)
+        function [left_data,left_labels,right_data,right_labels]=splitTreeData(featureDimension,featureValue,train_data,train_labels)
+            value = train_data(featureValue,featureDimension);
+            
+            l_indices = train_data(:,featureDimension)<=value;
+            r_indices = train_data(:,featureDimension)>value;
+            left_data = train_labels(l_indices);
+            right_data = train_labels(r_indices);
+            left_labels = train_labels(l_indices);
+            right_labels = train_labels(r_indices);
+        end
+        
+        function [left,right]=splitTreePi(featureDimension,featureValue,train_data,train_labels)
             classSize = size(obj.classes,1);
             left = zeros(classSize,1);
             right = zeros(classSize,1);
-            value = train_data(row,col);
+            value = train_data(featureValue,featureDimension);
             
-            l = train_data(train_data(:,col)<=value);
-            r = train_data(train_data(:,col)>value);
+            l = train_labels(train_data(:,featureDimension)<=value);
+            r = train_labels(train_data(:,featureDimension)>value);
             for i=1:classSize
                 left(i) = size(find(strcmp(l,obj.classes{i})),1);
                 right(i) = size(find(strcmp(r,obj.classes{i})),1);
             end
-            % Should work, too, but should be slower.
-%             for i=1:size(train_data,1)
-%                 classIndex = find(strcmp(obj.classes,train_labels(i,1)));
-%                 if size(classIndex,1)~=1 || size(classIndex,2)~=1
-%                     error('Occurence of one class is greater than 1.');
-%                 end
-%                 if train_data(i,col) <= value
-%                     left(classIndex) = left(classIndex) + 1;
-%                 else
-%                     right(classIndex) = right(classIndex) + 1;
-%                 end
-%             end
         end
-
+ 
         function [featureDimension,featureValue,splitCosts]=findBestSplit(train_data,train_labels)
             curr_i = 0;
             curr_j = 0;
-            curr_costs = 99999999;
+            curr_costs = inf;
             for i=1:size(train_data,1)
                 for j=1:size(train_data,2)
-                    [left,right] = splitTree(i,j,train_data,train_labels);
+                    [left,right] = splitTreePi(j,i,train_data,train_labels);
                     tmp = calcNewCosts(left,right);
                     if tmp < curr_costs
                         curr_i = i;
@@ -200,3 +247,4 @@ classdef BinaryTree
         
     end
 end
+
