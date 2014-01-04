@@ -56,10 +56,10 @@ classdef BinaryTree
                 obj.impurityMeasure = impurityMeasure;
             else
                 error(['This is not a valid method for the'...
-                        ' measurement of impurity of a given'...
-                        ' distribution. Please provide either'...
-                        ' ''gini'', ''entropy'', ''misclassRate'','...
-                        ' ''random''.']);
+                    ' measurement of impurity of a given'...
+                    ' distribution. Please provide either'...
+                    ' ''gini'', ''entropy'', ''misclassRate'','...
+                    ' ''random''.']);
             end
             
             argSize = size(varargin,2);
@@ -122,7 +122,7 @@ classdef BinaryTree
             % node to be added is j+1.
             j = 1;
             
-            treeHeight = 0;
+            treeHeight = 1;
             numLeafs = 0;
             abort = false;
             
@@ -136,6 +136,12 @@ classdef BinaryTree
                 distribution(i) = numel(find(strcmp(train_labels,obj.classes{i})));
             end
             obj.splittedTrainingData{3,1} = distribution;
+            
+            % Initialize list of all nodes with root node.
+            obj.allNodesList = [0; 0; false; treeHeight];
+            
+            % Initialize adjacency matrix.
+            obj.adjacencyMatriy = sparse(1,1);
             
             while ~abort
                 % Get distribution of the current node.
@@ -154,51 +160,96 @@ classdef BinaryTree
                 %
                 % If one of these tests return true, mark this node as leaf
                 % and do some other stuff for saving a new leaf.
-               if (obj.stoppingParams.pure==true && max(currDistribution)==sum(currDistribution)) ||...
-                       (obj.stoppingParams.depth~=0 && obj.allNodesList(4,currNode)>=obj.stoppingParams.depth) ||...
-                       (obj.stoppingParams.numSamples~=0 && sum(currDistribution)<obj.stoppingParams.numSamples)
-                   % Mark node as leaf
-                   
-                   
-                   % Create new entry in leafsList
-                   numLeafs = numLeafs + 1;
-                   obj.leafsList{1,numLeafs} = i;
-                   obj.leafsList{2,numLeafs} =...
-                       obj.classes{...
-                       find(currDistribution==max(currDistribution),1)};
-                   obj.leafsList{3,numLeafs} = currDistribution;
-                   
-                   % Delete entry in splittedTrainingData
-                   obj.splittedTrainingData{1,i} = [];
-                   obj.splittedTrainingData{2,i} = [];
-                   
-                   % Continue with next node.
-                   i = i + 1;
-                   continue
-               end
+                markAsLeaf = false;
+                if (obj.stoppingParams.pure==true...
+                        && max(currDistribution)==sum(currDistribution)) ||...
+                        (obj.stoppingParams.depth~=0 ...
+                        && obj.allNodesList(4,currNode)>=obj.stoppingParams.depth) ||...
+                        (obj.stoppingParams.numSamples~=0 ...
+                        && sum(currDistribution)<obj.stoppingParams.numSamples)
+                    markAsLeaf = true;
+                end
                 
                 %%%% Stopping criterias to be tested after actually
                 %%%% splitting the node.
                 
                 % Check if the benefit of splitting is below a given
                 % threshold t_{delta}.
-                % If yes, mark this node as leaf
-                % and do some other stuff for saving a new leaf.
+                % If yes, mark this node as leaf and do some other
+                % stuff for saving a new leaf.
+                currData = obj.splittedTrainingData{3,i};
+                currLabels = obj.splittedTrainingData{3,i};
+                [featureDimension,featureValue,splitCosts] =...
+                    obj.findBestSplit(currData,currLabels);
                 
-                if (obj.stoppingParams.pure==true && max(currDistribution)==sum(currDistribution)) ||...
-                       (obj.stoppingParams.depth~=0 && obj.allNodesList(4,currNode)>=obj.stoppingParams.depth)
+                if ~markAsLeaf
+                    if (obj.stoppingParams.benefit~=0 ...
+                            && (obj.costs(currDistribution)-splitCosts)<obj.stoppingParams.benefit)
+                        markAsLeaf = true;
+                    end
+                end
                 
-                %%%% Actually splitting the node.
-                
-
-                
-                i = i + 1;
-                if i==j
-                    abort = true;
+                if markAsLeaf
+                    % Mark node as leaf.
+                    obj.allNodesList(3,i) = true;
+                    
+                    % Create new entry in leafsList
+                    numLeafs = numLeafs + 1;
+                    obj.leafsList{1,numLeafs} = i;
+                    obj.leafsList{2,numLeafs} =...
+                        obj.classes{...
+                        find(currDistribution==max(currDistribution),1)};
+                    obj.leafsList{3,numLeafs} = currDistribution;
+                    
+                    % Delete entry in splittedTrainingData
+                    obj.splittedTrainingData{1,i} = [];
+                    obj.splittedTrainingData{2,i} = [];
+                    
+                    % Continue with next node.
+                    i = i + 1;
+                    if i>j
+                        abort = true;
+                    end
+                else
+                    % Actually splitting the node.
+                    
+                    % Update entry of current node in list of all nodes.
+                    obj.allNodesList(1,i) = featureDimension;
+                    obj.allNodesList(2,i) = featureValue;
+                    
+                    [left_data,left_labels,left_distribution,...
+                        right_data,right_labels,right_distribution] =...
+                        splitTreeData(featureDimension,featureValue,currData,currLabels);
+                    % Add both children to splitted training data.
+                    obj.splittedTrainingData{1,j+1} = left_data;
+                    obj.splittedTrainingData{2,j+1} = left_labels;
+                    obj.splittedTrainingData{3,j+1} = left_distribution;
+                    obj.splittedTrainingData{1,j+2} = right_data;
+                    obj.splittedTrainingData{2,j+2} = right_labels;
+                    obj.splittedTrainingData{3,j+2} = right_distribution;
+                    
+                    % Add both children to the list of all nodes.
+                    currHeight = obj.allNodesList(4,i);
+                    if currHeight == treeHeight
+                        treeHeight = treeHeight + 1;
+                    end
+                    newEntry = [0; 0; false; (currHeight + 1)];
+                    obj.allNodesList = [obj.allNodesList, newEntry, newEntry];
+                    
+                    % Update the adjacency matrix.
+                    currMatSize = size(obj.adjacencyMatrix);
+                    obj.adjacencyMatrix = [obj.adjacencyMatrix,zeros(currMatSize(1),1),zeros(currMatSize(1),1)];
+                    obj.adjacencyMatrix = [obj.adjacencyMatrix;zeros(1,currMatSize(2));zeros(1,currMatSize(2))];
+                    obj.adjacencyMatrix(i,currMatSize+1) = 1;
+                    obj.adjacencyMatrix(i,currMatSize+2) = 1;
+                    
+                    % Continue with next node but don't forget to increment
+                    % j by 2 so that it still points to the most recently
+                    % added node.
+                    i = i + 1;
+                    j = j + 2;
                 end
             end
- 
-            
         end
         
         % Classify a new data point given its feature vector.
@@ -313,7 +364,7 @@ classdef BinaryTree
                 right(i) = size(find(strcmp(r,obj.classes{i})),1);
             end
         end
- 
+        
         function [featureDimension,featureValue,splitCosts]=findBestSplit(obj,train_data,train_labels)
             curr_i = 0;
             curr_j = 0;
@@ -346,15 +397,27 @@ classdef BinaryTree
                 ' precision.']);
         end
         
-        function [left_data,left_labels,right_data,right_labels]=splitTreeData(featureDimension,featureValue,train_data,train_labels)
+        function [left_data,left_labels,left_distribution,...
+                right_data,right_labels,right_distribution]=...
+                splitTreeData(featureDimension,featureValue,train_data,train_labels)
             value = train_data(featureValue,featureDimension);
             
             l_indices = train_data(:,featureDimension)<=value;
             r_indices = train_data(:,featureDimension)>value;
-            left_data = train_labels(l_indices);
-            right_data = train_labels(r_indices);
+            left_data = train_data(l_indices);
+            right_data = train_data(r_indices);
             left_labels = train_labels(l_indices);
             right_labels = train_labels(r_indices);
+            
+            classSize = size(obj.classes,1);
+            left_distribution = zeros(classSize,1);
+            right_distribution = zeros(classSize,1);
+            for i=1:classSize
+                left_distribution(i) =...
+                    size(find(strcmp(left_labels,obj.classes{i})),1);
+                right_distribution(i) =...
+                    size(find(strcmp(right_labels,obj.classes{i})),1);
+            end
         end
         
     end
