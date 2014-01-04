@@ -15,6 +15,8 @@ if(~loadData)
     data = data{1};
     % detete header row
     data = data(2:end,:);
+    % convert entries to double precision
+    data(:,3:18) = cellfun(@str2double,data(:,3:18),'un',0);
     fclose(fid);
     
     save('data/data.mat','data');
@@ -24,7 +26,7 @@ else
     load('data/data.mat');
 end;
 
-%% IMPORTANT: when accessing data or the training/validation sets, use {m,n}
+%% IMPORTANT: when accessing data of the training/validation sets, use {}
 %% randomize data and return appropriate sets
 
 % random permutation of the dataset
