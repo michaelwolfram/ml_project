@@ -141,7 +141,7 @@ classdef BinaryTree
             obj.splittedTrainingData{3,1} = distribution;
             
             % Initialize list of all nodes with root node.
-            obj.allNodesList = [0; 0; false; treeHeight];
+            obj.allNodesList = {0; 0; false; treeHeight};
             
             % Initialize adjacency matrix.
             obj.adjacencyMatrix = sparse(1,1);
@@ -164,12 +164,18 @@ classdef BinaryTree
                 % If one of these tests return true, mark this node as leaf
                 % and do some other stuff for saving a new leaf.
                 markAsLeaf = false;
-                if (obj.stoppingParams.pure==true...
-                        && max(currDistribution)==sum(currDistribution)) ||...
-                        (obj.stoppingParams.depth~=0 ...
-                        && obj.allNodesList(4,i)>=obj.stoppingParams.depth) ||...
-                        (obj.stoppingParams.numSamples~=0 ...
-                        && sum(currDistribution)<obj.stoppingParams.numSamples)
+                a = obj.stoppingParams.pure==true;
+                b = max(currDistribution)==sum(currDistribution);
+                c = obj.stoppingParams.depth~=0;
+                d = obj.allNodesList{4,i}>=obj.stoppingParams.depth;
+                e = obj.stoppingParams.numSamples~=0;
+                f = sum(currDistribution)<obj.stoppingParams.numSamples;
+                if (a...
+                        && b) ||...
+                        (c ...
+                        && d) ||...
+                        (e ...
+                        && f)
                     markAsLeaf = true;
                 end
                 
@@ -185,16 +191,13 @@ classdef BinaryTree
                 [featureDimension,featureValue,splitCosts] =...
                     obj.findBestSplit(currData,currLabels);
                 
-                if ~markAsLeaf
-                    if (obj.stoppingParams.benefit~=0 ...
-                            && (obj.costs(currDistribution)-splitCosts)<obj.stoppingParams.benefit)
-                        markAsLeaf = true;
-                    end
-                end
+                markAsLeaf = markAsLeaf || featureDimension==0 ||...
+                    featureValue==0 || (obj.stoppingParams.benefit~=0 ...
+                    && (obj.costs(currDistribution)-splitCosts)<obj.stoppingParams.benefit);
                 
                 if markAsLeaf
                     % Mark node as leaf.
-                    obj.allNodesList(3,i) = true;
+                    obj.allNodesList{3,i} = true;
                     
                     % Create new entry in leafsList
                     numLeafs = numLeafs + 1;
@@ -217,12 +220,13 @@ classdef BinaryTree
                     % Actually splitting the node.
                     
                     % Update entry of current node in list of all nodes.
-                    obj.allNodesList(1,i) = featureDimension;
-                    obj.allNodesList(2,i) = featureValue;
+                    obj.allNodesList{1,i} = featureDimension;
+                    obj.allNodesList{2,i} =...
+                        train_data{featureValue,featureDimension};
                     
                     [left_data,left_labels,left_distribution,...
                         right_data,right_labels,right_distribution] =...
-                        splitTreeData(featureDimension,featureValue,currData,currLabels);
+                        obj.splitTreeData(featureDimension,featureValue,currData,currLabels);
                     % Add both children to splitted training data.
                     obj.splittedTrainingData{1,j+1} = left_data;
                     obj.splittedTrainingData{2,j+1} = left_labels;
@@ -232,30 +236,30 @@ classdef BinaryTree
                     obj.splittedTrainingData{3,j+2} = right_distribution;
                     
                     % Add both children to the list of all nodes.
-                    currHeight = obj.allNodesList(4,i);
+                    currHeight = obj.allNodesList{4,i};
                     if currHeight == treeHeight
                         treeHeight = treeHeight + 1;
                     end
-                    newEntry = [0; 0; false; (currHeight + 1)];
+                    newEntry = {0; 0; false; (currHeight + 1)};
                     obj.allNodesList = [obj.allNodesList, newEntry, newEntry];
                     
                     % Update the adjacency matrix.
                     currMatSize = size(obj.adjacencyMatrix);
                     obj.adjacencyMatrix = [obj.adjacencyMatrix,zeros(currMatSize(1),1),zeros(currMatSize(1),1)];
-                    obj.adjacencyMatrix = [obj.adjacencyMatrix;zeros(1,currMatSize(2));zeros(1,currMatSize(2))];
+                    obj.adjacencyMatrix = [obj.adjacencyMatrix;zeros(1,(currMatSize(2)+2));zeros(1,(currMatSize(2)+2))];
                     obj.adjacencyMatrix(i,currMatSize+1) = 1;
                     obj.adjacencyMatrix(i,currMatSize+2) = 1;
+                    
+                    % Delete entry in splittedTrainingData.
+                    obj.splittedTrainingData{1,i} = [];
+                    obj.splittedTrainingData{2,i} = [];
+                    obj.splittedTrainingData{3,i} = [];
                     
                     % Continue with next node but don't forget to increment
                     % j by 2 so that it still points to the most recently
                     % added node.
                     i = i + 1;
                     j = j + 2;
-                    
-                    % Finally, delete entry in splittedTrainingData
-                    obj.splittedTrainingData{1,i} = [];
-                    obj.splittedTrainingData{2,i} = [];
-                    obj.splittedTrainingData{3,i} = [];
                 end
             end
         end
@@ -267,16 +271,24 @@ classdef BinaryTree
             % Select root at start node.
             currNode = 1;
             while isempty(classification)
-                if obj.allNodesList(3,currNode) == true
+                if obj.allNodesList{3,currNode} == true
                     % This node is a leaf. Classify and exit.
-                    index = find(obj.leafsList{1,:}==currNode,1);
+                    index = find(cell2mat(obj.leafsList(1,:))==currNode,1);
                     classification = obj.leafsList{2,index};
                     distribution = obj.leafsList{3,index};
                     classCertainty = max(distribution) / sum(distribution);
                 else
                     % This node is a inner node. Select correct child.
                     [~, children] = find(obj.adjacencyMatrix(currNode,:)==1,2);
-                    if featureVector(obj.allNodesList(1,currNode)) <= obj.allNodesList(2,currNode)
+                    dimension = obj.allNodesList{1,currNode};
+                    if dimension <= 2
+                        left = BinaryTree.cstrcmp(...
+                            featureVector{dimension},obj.allNodesList{2,currNode})<=0;
+                    else
+                        left = featureVector{dimension}...
+                            <= obj.allNodesList{2,currNode};
+                    end
+                    if left
                         % Select left child.
                         currNode = children(1);
                     else
@@ -370,21 +382,19 @@ classdef BinaryTree
             value = train_data{featureValue,featureDimension};
             
             if featureDimension <= 2
-                a = cellfun(@(x) BinaryTree.cstrcmp(x,value),train_data(:,featureDimension))<=0;
-                l = train_labels(a);
-                b = cellfun(@(x) BinaryTree.cstrcmp(x,value),train_data(:,featureDimension))>0;
-                r = train_labels(b);
+                left_indices = cellfun(@(x) BinaryTree.cstrcmp(x,value),train_data(:,featureDimension))<=0;
+                right_indices = cellfun(@(x) BinaryTree.cstrcmp(x,value),train_data(:,featureDimension))>0;
             else
-                a = cellfun(@(x) (x<=value),train_data(:,featureDimension));
-                l = train_labels(a);
-                b = cellfun(@(x) (x>value),train_data(:,featureDimension));
-                r = train_labels(b);
-%                 l = train_labels(train_data{:,featureDimension}<=value);
-%                 r = train_labels(train_data{:,featureDimension}>value);
+                left_indices = cellfun(@(x) (x<=value),train_data(:,featureDimension));
+                right_indices = cellfun(@(x) (x>value),train_data(:,featureDimension));
             end
+            left_labels = train_labels(left_indices);
+            right_labels = train_labels(right_indices);
+%           l = train_labels(train_data{:,featureDimension}<=value);
+%           r = train_labels(train_data{:,featureDimension}>value);
             for i=1:classSize
-                left(i) = size(find(strcmp(l,obj.classes{i})),1);
-                right(i) = size(find(strcmp(r,obj.classes{i})),1);
+                left(i) = size(find(strcmp(left_labels,obj.classes{i})),1);
+                right(i) = size(find(strcmp(right_labels,obj.classes{i})),1);
             end
         end
         
@@ -407,6 +417,40 @@ classdef BinaryTree
             featureValue = curr_i;
             splitCosts = curr_costs;
         end
+        
+        function [left_data,left_labels,left_distribution,...
+                right_data,right_labels,right_distribution]=...
+                splitTreeData(obj,featureDimension,featureValue,train_data,train_labels)
+            value = train_data{featureValue,featureDimension};
+            
+            if featureDimension <= 2
+                left_indices = cellfun(@(x) BinaryTree.cstrcmp(x,value),train_data(:,featureDimension))<=0;
+                right_indices = cellfun(@(x) BinaryTree.cstrcmp(x,value),train_data(:,featureDimension))>0;
+            else
+                left_indices = cellfun(@(x) (x<=value),train_data(:,featureDimension));
+                right_indices = cellfun(@(x) (x>value),train_data(:,featureDimension));
+%               l_indices = train_data{:,featureDimension}<=value;
+%               r_indices = train_data{:,featureDimension}>value;
+            end
+            
+            left_data = train_data(left_indices,:);
+            right_data = train_data(right_indices,:);
+            left_labels = train_labels(left_indices);
+            right_labels = train_labels(right_indices);
+%           l = train_labels(train_data{:,featureDimension}<=value);
+%           r = train_labels(train_data{:,featureDimension}>value);
+            
+            classSize = size(obj.classes,1);
+            left_distribution = zeros(classSize,1);
+            right_distribution = zeros(classSize,1);
+            
+%             l_indices = train_labels{l_indices};
+%             r_indices = train_labels{r_indices};
+            for i=1:classSize
+                left_distribution(i) = size(find(strcmp(left_labels,obj.classes{i})),1);
+                right_distribution(i) = size(find(strcmp(right_labels,obj.classes{i})),1);
+            end
+        end
     end
     
     methods (Access=public, Static=true)
@@ -418,31 +462,6 @@ classdef BinaryTree
                 ' [''true''|''false''], an integer value, a threshold'...
                 ' in integer precision or a threshold in double'...
                 ' precision.']);
-        end
-        
-        function [left_data,left_labels,left_distribution,...
-                right_data,right_labels,right_distribution]=...
-                splitTreeData(featureDimension,featureValue,train_data,train_labels)
-            value = train_data{featureValue,featureDimension};
-            
-            l_indices = train_data{:,featureDimension}<=value;
-            r_indices = train_data{:,featureDimension}>value;
-            left_data = train_data(l_indices);
-            right_data = train_data(r_indices);
-            left_labels = train_labels(l_indices);
-            right_labels = train_labels(r_indices);
-            
-            classSize = size(obj.classes,1);
-            left_distribution = zeros(classSize,1);
-            right_distribution = zeros(classSize,1);
-            l = train_labels{l_indices};
-            r = train_labels{r_indices};
-            for i=1:classSize
-                left_distribution(i) =...
-                    size(find(strcmp(l,obj.classes{i})),1);
-                right_distribution(i) =...
-                    size(find(strcmp(r,obj.classes{i})),1);
-            end
         end
         
         function cmp = cstrcmp( a, b )

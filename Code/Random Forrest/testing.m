@@ -1,19 +1,24 @@
 maxDepth = 10;
 
+train_data = train_data_small;
+train_labels = train_labels_small;
+valid_data = valid_data_small;
+valid_labels = valid_labels_small;
+
 accuracies = zeros(3,maxDepth);
 trainTimes = zeros(3,maxDepth);
 testTimes = zeros(3,maxDepth);
 
 startAccuraciesString = 'Evaluation/Accuracies/accuracy';
-startTrainTimesString = 'Evaluation/Times/timeTrain';
-startTestTimesString = 'Evaluation/Times/timeTest';
+% startTrainTimesString = 'Evaluation/Times/timeTrain';
+% startTestTimesString = 'Evaluation/Times/timeTest';
 matEnd = '.mat';
 
 try
     for i = 1:maxDepth
         maxHeight = i;
         
-        bT = BinaryTree('gini','p',true,'d',maxHeight);
+        bT = BinaryTree('gini','p',true,'d',maxHeight,'s',2);
         tic
         bT = bT.trainImpurityMeasure(train_data,train_labels);
         Ttrain=toc;
@@ -41,7 +46,7 @@ try
         
         %%%%%
         clear bT;
-        bT = BinaryTree('entropy','p',true,'d',maxHeight);
+        bT = BinaryTree('entropy','p',true,'d',maxHeight,'s',2);
         tic
         bT = bT.trainImpurityMeasure(train_data,train_labels);
         Ttrain=toc;
@@ -69,7 +74,7 @@ try
         
         %%%%%
         clear bT;
-        bT = BinaryTree('misclassRate','p',true,'d',maxHeight);
+        bT = BinaryTree('misclassRate','p',true,'d',maxHeight,'s',2);
         tic
         bT = bT.trainImpurityMeasure(train_data,train_labels);
         Ttrain=toc;
@@ -100,7 +105,8 @@ try
             '_all',matEnd);
         save(saveString,'accuracies','trainTimes','testTimes','-v7.3');
     end
-catch
+catch exc
+    getReport(exc)
     saveString = strcat(startAccuraciesString,'_',num2str(i), ...
         '_all_catch',matEnd);
     save(saveString,'accuracies','trainTimes','testTimes','-v7.3');
@@ -109,8 +115,3 @@ end
 saveString = strcat(startAccuraciesString,'_',num2str(i), ...
     '_all_final',matEnd);
 save(saveString,'accuracies','trainTimes','testTimes','-v7.3');
-
-
-
-
-
