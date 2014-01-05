@@ -11,7 +11,7 @@ matEnd = '.mat';
 
 
 try
-    for i = 4:2:maxDepth
+    for i = 14:2:maxDepth
         if i==0
             numTests = 1;
         else
@@ -24,6 +24,11 @@ try
             else
                 numFerns = k;
             end
+            
+            if i == 14 && k<=20
+                continue;
+            end
+            
             ferest = Ferest(numFerns, numTests);
             ferest = ferest.trainRandom(train_data, train_labels);
             
