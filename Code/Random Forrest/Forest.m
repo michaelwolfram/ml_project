@@ -14,6 +14,11 @@ classdef Forest
         percentage;
     end
     
+    properties (Access=private)
+       impurityMeasure;
+       varargin;
+    end
+    
     methods
         function obj = Forest(numTrees, percentage, validDimSize,...
                 impurityMeasure, varargin)
@@ -23,6 +28,12 @@ classdef Forest
             for i=1:numTrees
                 obj.trees{i} = BinaryTree(impurityMeasure, varargin{:});
             end
+        end
+        
+        function obj = addTree(obj)
+           obj.numTrees = obj.numTrees + 1;
+           obj.trees{obj.numTrees} = BinaryTree(obj.impurityMeasure,...
+               obj.varargin{:});
         end
         
         function obj = train(obj, train_data, train_labels)
