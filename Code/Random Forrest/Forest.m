@@ -12,6 +12,8 @@ classdef Forest
         % Percentage of the size of the training data used for training a
         % single tree.
         percentage;
+        % Already trained trees.
+        trainedTrees;
     end
     
     properties (Access=private)
@@ -23,6 +25,11 @@ classdef Forest
         function obj = Forest(numTrees, percentage, validDimSize,...
                 impurityMeasure, varargin)
             obj.numTrees = numTrees;
+            obj.impurityMeasure = impurityMeasure;
+            obj.varargin = varargin;
+            if numTrees>0
+                obj.trainedTrees = zeros(1,numTrees);
+            end
             obj.percentage = percentage;
             obj.validDimSize = validDimSize;
             for i=1:numTrees
@@ -32,12 +39,14 @@ classdef Forest
         
         function obj = addTree(obj)
            obj.numTrees = obj.numTrees + 1;
+           obj.trainedTrees = [obj.trainedTrees,0];
            obj.trees{obj.numTrees} = BinaryTree(obj.impurityMeasure,...
                obj.varargin{:});
         end
         
         function obj = train(obj, train_data, train_labels)
-            for i=1:obj.numTrees
+            untrainedTrees = find(obj.trainedTrees==0);
+            for i=1:length(untrainedTrees)
                 % Generate random train set for each tree with replacement.
                 numTrainData = length(train_data);
                 
@@ -83,8 +92,10 @@ classdef Forest
                 permutatedDimensions = randperm(size(train_data,2));
                 
                 % Train a single tree.
-                obj.trees{i} = obj.trees{i}.train(curr_train_data,...
+                k = untrainedTrees(i);
+                obj.trees{k} = obj.trees{k}.train(curr_train_data,...
                     curr_train_labels,permutatedDimensions(1:obj.validDimSize));
+                obj.trainedTrees{k} = 1;
             end
         end
         
