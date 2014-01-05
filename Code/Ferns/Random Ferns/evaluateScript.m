@@ -1,6 +1,6 @@
 %% Ferest Tests
-maxDepth = 20;
-maxFerns = 30;
+maxDepth = 12;
+maxFerns = 100;
 
 accuracies = zeros(maxFerns,maxDepth);
 
@@ -11,14 +11,14 @@ matEnd = '.mat';
 
 
 try
-    for i = 14:2:maxDepth
+    for i = 8:2:maxDepth
         if i==0
             numTests = 1;
         else
             numTests = i;
         end
         
-        for k = 0:5:maxFerns
+        for k = 40:10:maxFerns
             if k == 0
                 numFerns = 1;
             else
@@ -60,7 +60,8 @@ try
             '_',num2str(k),matEnd);
         save(saveString,'accuracies','-v7.3');
     end
-catch
+catch exc
+    getReport(exc)
     saveString = strcat(startAccuraciesString,'_',num2str(i), ...
         '_',num2str(k),matEnd);
     save(saveString,'accuracies','-v7.3');
