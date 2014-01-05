@@ -95,7 +95,7 @@ classdef Forest
                 k = untrainedTrees(i);
                 obj.trees{k} = obj.trees{k}.train(curr_train_data,...
                     curr_train_labels,permutatedDimensions(1:obj.validDimSize));
-                obj.trainedTrees{k} = 1;
+                obj.trainedTrees(k) = 1;
             end
         end
         

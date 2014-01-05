@@ -9,9 +9,9 @@ impurityMeasure = 'gini';
 maxNumTrees = 5;
 validDepths = [1,2,4,6,8,10,12,15];
 
-accuracies = zeros(maxNumTrees,maxDepth);
-trainTimes = zeros(maxNumTrees,maxDepth);
-testTimes = zeros(maxNumTrees,maxDepth);
+accuracies = zeros(maxNumTrees,length(validDepths));
+trainTimes = zeros(maxNumTrees,length(validDepths));
+testTimes = zeros(maxNumTrees,length(validDepths));
 
 startAccuraciesString = 'Evaluation_Forests/Gini_only/accuracy';
 matEnd = '.mat';
@@ -30,7 +30,7 @@ try
             % Re-train forest.
             tic
             forest = forest.train(train_data,train_labels);
-            Ttrain=toc;
+            Ttrain=toc
 
             % Classify testing data.
             numDataPoints = size(valid_data,1);
@@ -42,7 +42,7 @@ try
                     correct = correct + 1;
                 end
             end
-            Ttest=toc;
+            Ttest=toc
             accuracy = correct/numDataPoints;
 
             accuracies(currNumTrees,i) = accuracy;
