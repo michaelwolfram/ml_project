@@ -1,13 +1,14 @@
 maxDepth = 10;
+validDepth = [1,2,5,10,12,15];
 
 accuracies = zeros(3,maxDepth);
 trainTimes = zeros(3,maxDepth);
 testTimes = zeros(3,maxDepth);
 
-startAccuraciesString = 'Evaluation/Accuracies/accuracy';
-% startTrainTimesString = 'Evaluation/Times/timeTrain';
-% startTestTimesString = 'Evaluation/Times/timeTest';
+startAccuraciesString = 'Evaluation_Forests/Gini_only/accuracy';
 matEnd = '.mat';
+
+%% Compare gini, entropy and misclassification rate.
 
 try
     for i = 1:maxDepth
@@ -28,7 +29,7 @@ try
             end
         end
         Ttest=toc;
-        accuracy = correct/numDataPoints
+        accuracy = correct/numDataPoints;
         
         accuracies(1,i) = accuracy;
         trainTimes(1,i) = Ttrain;

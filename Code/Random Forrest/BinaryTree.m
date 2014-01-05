@@ -383,9 +383,15 @@ classdef BinaryTree
             curr_i = 0;
             curr_j = 0;
             curr_costs = inf;
-            for i=1:size(train_data,1)
-                for j=1:size(train_data,2)
+            for j=1:size(train_data,2) % Loop over feature dimensions.
+                if j<=2
+                    [~,uniqueIndices,~] = unique(train_data(:,j));
+                else
+                    [~,uniqueIndices,~] = unique(cell2mat(train_data(:,j)));
+                end
+                for k=1:length(uniqueIndices) % Loop over unique feature values.
                     if ~isempty(find(obj.validDimensions==j,1))
+                        i = uniqueIndices(k);
                         [left,right] = obj.splitTreePi(j,i,train_data,train_labels);
                         tmp = obj.calcNewCosts(left,right);
                         if tmp < curr_costs
