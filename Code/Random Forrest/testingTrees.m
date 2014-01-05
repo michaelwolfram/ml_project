@@ -20,7 +20,7 @@ try
         
         bT = BinaryTree('gini','p',true,'d',maxHeight,'s',2);
         tic
-        bT = bT.trainImpurityMeasure(train_data,train_labels);
+        bT = bT.train(train_data,train_labels);
         Ttrain=toc;
         
         numDataPoints = size(valid_data,1);
@@ -48,7 +48,7 @@ try
         clear bT;
         bT = BinaryTree('entropy','p',true,'d',maxHeight,'s',2);
         tic
-        bT = bT.trainImpurityMeasure(train_data,train_labels);
+        bT = bT.train(train_data,train_labels);
         Ttrain=toc;
         
         numDataPoints = size(valid_data,1);
@@ -76,7 +76,7 @@ try
         clear bT;
         bT = BinaryTree('misclassRate','p',true,'d',maxHeight,'s',2);
         tic
-        bT = bT.trainImpurityMeasure(train_data,train_labels);
+        bT = bT.train(train_data,train_labels);
         Ttrain=toc;
         
         numDataPoints = size(valid_data,1);

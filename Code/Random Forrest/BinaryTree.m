@@ -6,6 +6,9 @@ classdef BinaryTree
         % All possible classes.
         classes;
         
+        % Valid dimensions for splitting.
+        validDimensions;
+        
         % Used impurity measure of this tree.
         impurityMeasure;
         
@@ -54,15 +57,13 @@ classdef BinaryTree
         function obj=BinaryTree(impurityMeasure, varargin)
             if strcmp(impurityMeasure,'gini') ||...
                     strcmp(impurityMeasure,'entropy') ||...
-                    strcmp(impurityMeasure,'misclassRate') ||...
-                    strcmp(impurityMeasure,'random')
+                    strcmp(impurityMeasure,'misclassRate')
                 obj.impurityMeasure = impurityMeasure;
             else
                 error(['This is not a valid method for the'...
                     ' measurement of impurity of a given'...
                     ' distribution. Please provide either'...
-                    ' ''gini'', ''entropy'', ''misclassRate'','...
-                    ' ''random''.']);
+                    ' ''gini'', ''entropy'', ''misclassRate''.']);
             end
             
             argSize = size(varargin,2);
@@ -89,32 +90,12 @@ classdef BinaryTree
                 end
             end
         end
-        
-        % Train a tree with some training data by randomly selecting
-        % the features as well as the thresholds at each decision node.
-        function obj=trainRandom(obj, train_data, train_labels)
-            % When initializing a tree a impurity measure method must be
-            % specified. Therefore, the consistency of the used method
-            % should be checked here.
-            if ~strcmp(obj.impurityMeasure,'random')
-                error('This tree is supposed to by trained with the random method.');
-            end
-            
-            obj.classes = unique(train_labels);
-            
-        end
-        
+                
         % Train a tree with some training data using some impurity measure
         % like the Gini index.
-        function obj=trainImpurityMeasure(obj, train_data, train_labels)
-            % When initializing a tree a impurity measure method must be
-            % specified. Therefore, the consistency of the used method
-            % should be checked here.
-            if strcmp(obj.impurityMeasure,'random')
-                error('This tree is supposed to by trained with some kind of impurity measure like the Gini index.');
-            end
-            
+        function obj=train(obj, train_data, train_labels, validDimensions)
             obj.classes = unique(train_labels);
+            obj.validDimensions = validDimensions;
             
             % In the list of splitted training data i specifies the
             % currently treated node and the one to be treated next,
@@ -404,12 +385,14 @@ classdef BinaryTree
             curr_costs = inf;
             for i=1:size(train_data,1)
                 for j=1:size(train_data,2)
-                    [left,right] = obj.splitTreePi(j,i,train_data,train_labels);
-                    tmp = obj.calcNewCosts(left,right);
-                    if tmp < curr_costs
-                        curr_i = i;
-                        curr_j = j;
-                        curr_costs = tmp;
+                    if ~isempty(find(obj.validDimensions==j,1))
+                        [left,right] = obj.splitTreePi(j,i,train_data,train_labels);
+                        tmp = obj.calcNewCosts(left,right);
+                        if tmp < curr_costs
+                            curr_i = i;
+                            curr_j = j;
+                            curr_costs = tmp;
+                        end
                     end
                 end
             end
