@@ -1,0 +1,84 @@
+\documentclass[twocolumn]{article}
+\usepackage{ml_homework_template}
+\usepackage{amsmath,amsthm,amssymb} 
+
+% You should submit your final project by emailing it to fp@class.brml.org. The subject line must read "final project". 
+% If the subject line does not match, an error email is returned; otherwise, a positive ACK is replied. Automated deadline 
+% checking is implemented. The submission must be in before Feb. 8, 2014 (i.e., by Feb, 7, 23:59 CET). Please submit the 
+% following:
+%•	a short "paper" describing what you did, describing the data, describing the method, and your results. Please keep 
+%   it succinct, with the class teachers as readership in mind. It should contain plots describing your results. This 
+%   paper must be submitted in PDF format.
+%•	all software necessary to reproduce your results, i.e., also the methodologies to preprocess the data.
+
+\title{Final Project of Machine Learning}
+
+
+\author{
+\name{Jonas Uhrig}\\
+\imat{03616049}\\
+\email{jonas.uhrig@in.tum.de}
+\And
+\name{Michael Wolfram} \\
+\imat{03616011}\\
+\email{michaelwolfram@gmx.de}
+}
+
+
+
+\begin{document}
+\onecolumn
+\maketitle
+
+\section*{Abstract}
+
+In this paper we describe our final project for the Machine Learning class of 2013/14 at TUM. We use data set 4) containing information about body postures and movements and apply two similar Machine Learning algorithms that were implemented within this project. The used algorithms are called 'Ferns' and 'Random Tree' or 'Random Forest'.\\
+The programming language of our choice is Matlab - some of the used approaches on Ferns are based on ideas from Mustafa \"Ozuyal et al. [1], the development of the trees and forests was only based on ideas from the lecture.
+
+
+
+\twocolumn
+
+\section{Approach}
+% 'what you did'
+We already know about Trees and Forests from the lecture - additionally we read of a Machine Learning algorithm called \textit{Ferns} [1], which was recently introduced to detect objects in images. Ferns have a very similar behavior as Forests and, in fact, are completely replaceable - though the important difference lies in the striking evaluation speed for the classification of new samples. 
+
+For object detection purposes, Ferns are built using binary values as feature vector which initially posed a problem for the chosen PUC-Rio Data Set containing continuous (e.g the sensor data) and categorical (e.g gender, names) features. A key point of Ferns is chance so we thought it might serve to randomly choose a threshold within the range of each feature and do a simple comparison, resulting in a new binary feature value - this approach was also used by Miron Bartosz Kursa [2], which encouraged us to continue the implementation.
+
+
+\section{Data}
+
+
+
+
+\section{Method}
+
+\subsection{Forest}
+
+\subsection{Fererst}
+
+
+
+\section{Results}
+
+\subsection{Forest}
+
+\subsection{Fererst}
+
+\subsection{Comparison}
+
+
+\onecolumn
+\section*{References}
+
+\begin{tabular}{p{1cm}p{11cm}}
+
+$[1]$ & M. \"Ozuysal, P. Fua, and V. Lepetit. Fast Keypoint Recognition in Ten Lines of Code. \textit{2007 IEEE Conference on Computer Vision and Pattern Recognition}, pages 1-8, June 2007\\
+ & \\
+$[2]$ & M. B. Kursa. Random ferns method implementation for the general-purpose machine learning. \textit{Interdisciplinary Centre for Mathematical and Computational Modelling, University of Warsaw}, February 2012
+
+\end{tabular}
+
+
+
+\end{document}
