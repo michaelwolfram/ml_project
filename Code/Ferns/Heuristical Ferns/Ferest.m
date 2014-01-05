@@ -27,18 +27,22 @@ classdef Ferest
         end
         
         function obj = trainRandom(obj, train_data, train_labels)
-            
+            numTrainData = length(train_data);
             [obj.classes,~,~]=unique(train_labels);
-            min_data(3:18) = min(cell2mat(train_data(:,3:18)));
-            max_data(3:18) = max(cell2mat(train_data(:,3:18)));
             
             for i = 1:obj.numFerns
-                % tic
+                permutationWithReplacement = randi(numTrainData,1,numTrainData);
+                
+                train_data = train_data(permutationWithReplacement,:);
+                train_labels = train_labels(permutationWithReplacement,:);
+                
+                [~, ii] = sort(train_data(:,size(train_data,2)));
+                train_data = train_data(ii,:);
+                [~, ii] = sort(train_labels);
+                train_labels = train_labels(ii);
+                
                 obj.fernList{i} = obj.fernList{i}. ...
-                    trainRandom(train_data, train_labels, ...
-                    min_data, max_data);
-                % display('Elapsed time for the training of one FERN:')
-                % toc
+                    trainRandom(train_data, train_labels);
                 obj.testLists{i} = obj.fernList{i}.testList;
                 obj.histogramList{i} = obj.fernList{i}.histograms;
             end
