@@ -135,7 +135,7 @@ accuracies_12 = zeros(1,20);
 timesTrain_12 = zeros(1,20);
 timesTest_12 = zeros(1,20);
 
-for i=1:17
+for i=1:19
     saveString = strcat(startAccuraciesString,'_','gini',...
         '_',num2str(12),'_',num2str(i),'_',matEnd);
     load(saveString);
