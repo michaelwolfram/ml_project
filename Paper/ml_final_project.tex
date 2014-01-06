@@ -62,7 +62,7 @@ This section gives a short overview of the properties of both methods. The algor
 
 \subsubsection{Basic Principle}
 As known from the lecture, we implemented a Forest as ensemble of a certain number of Decision Trees. Our Trees are defined by the following parameters:\\
-First, there is the possibility to prune the tree. Referring to the lecture, since we implemented bagging and feature subset selection for the training of each Tree of a Forest to overcome overfitting on the whole data set pruning as third method became superfluous.\\
+First, there is the possibility to prune the tree. Referring to the lecture, since we implemented bagging and feature subset selection for the training of each Tree of a Forest to overcome overfitting on the whole data set pruning as third method became superfluous. The second one of the implemented methods\\
 Other properties of a Tree are its criteria when to stop growing. We implemented the four suggested ones from the lecture, i.e. the depth of the tree can be limited to a certain maximum, a lower bound for the benefit of another split can be specified, if the number of training samples in a certain node is below a given threshold it will not be split any more and is marked as leaf and lastly, the tree stops growing at a particular node if the distribution of labels/classes of the training data in this node is pure.\\
 For the last stopping heuristic we implemented the impurity measures Gini index, Entropy and misclassification rate from the lecture. After some small initial tests we decided to concentrate on the Gini index for further testing since the Gini index was more accurate on a subset of the given training data even though the Entropy was slightly faster.\\
 
