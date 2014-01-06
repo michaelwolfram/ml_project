@@ -47,12 +47,17 @@ For object detection purposes, Ferns are built using binary values as feature ve
 
 
 \section{Data}
-sitting: 50631
-sittingdown: 11827
-standing: 47370
-standingup: 12415
-walking: 43390
-
+The provided data set consists of 165633 samples of recorded body postures and movements. On the one hand the features contain information about the humans themselves: name, gender, age, height, weight and body-mass-index. On the other hand sensor readings of accelerometers from human joints are included. This results in a total of 18 features.\\
+The possible postures of the subjects are: 'sitting', 'sittingdown', 'standing', 'standingup' and 'walking'. The distribution of the data set among these classes is as follows:\\\\
+\begin{tabular}{p{2cm}p{2cm}}
+'sitting': & 50631\\
+'sittingdown': & 11827\\
+'standing': & 47370\\
+'standingup': & 12415\\
+'walking': & 43390
+\end{tabular}\\\\
+Given that unequal distribution we selected not just a certain number but rather a particular percentage of randomly drawn data samples from each class for the testing set as stated in the project description. We used the usual partition of $\frac{2}{3}, \frac{1}{3}$ for the training and testing set.\\
+During the evaluation of Forests we were faced with limitations regarding time and computation power. Therefore, we were forced to make a decision whether to evaluate Forests on the whole provided data set or to analyse Forests for a broader variety of combinations of their parameters. Since we consider the latter to be more important we decided to do the majority of our analysis of Forests on $10\%$ of the data set.
 
 
 \section{Method}
