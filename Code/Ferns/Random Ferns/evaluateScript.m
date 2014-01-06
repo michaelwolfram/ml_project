@@ -1,6 +1,6 @@
 %% Ferest Tests
 maxDepth = 12;
-maxFerns = 100;
+maxFerns = 70;
 
 accuracies = zeros(maxFerns,maxDepth);
 
@@ -11,7 +11,7 @@ matEnd = '.mat';
 
 
 try
-    for i = 8:2:maxDepth
+    for i = 10:2:maxDepth
         if i==0
             numTests = 1;
         else
@@ -25,7 +25,7 @@ try
                 numFerns = k;
             end
             
-            if i == 14 && k<=20
+            if i == 10 && k<=60
                 continue;
             end
             
