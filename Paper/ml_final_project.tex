@@ -11,7 +11,7 @@
 %   paper must be submitted in PDF format.
 %•	all software necessary to reproduce your results, i.e., also the methodologies to preprocess the data.
 
-\title{Final Project of Machine Learning}
+\title{Final Project of Machine Learning\\-\\Forests and Ferests}
 
 
 \author{
@@ -32,7 +32,7 @@
 
 \section*{Abstract}
 
-In this paper we describe our final project for the Machine Learning class of 2013/14 at TUM. We use data set 4) containing information about body postures and movements and apply two similar Machine Learning algorithms that were implemented within this project. The used algorithms are called 'Ferns' and 'Random Tree' or 'Random Forest'.\\
+In this paper we describe our final project for the Machine Learning class of 2013/14 at TUM. We use data set 4) containing information about body postures and movements and apply two similar Machine Learning algorithms that were implemented within this project. The used algorithms are called 'Ferns' and 'Binary Tree' or 'Random Forest' - we also cover different variations of those algorithms. Moreover, we applied heuristical approaches used for Trees to our Ferns to evaluate advantages regarding classification accuracy.\\
 The programming language of our choice is Matlab - some of the used approaches on Ferns are based on ideas from Mustafa \"Ozuyal et al. [1], the development of the trees and forests was only based on ideas from the lecture.
 
 
@@ -41,7 +41,7 @@ The programming language of our choice is Matlab - some of the used approaches o
 
 \section{Approach}
 % 'what you did'
-We already know about Trees and Forests from the lecture - additionally we read of a Machine Learning algorithm called \textit{Ferns} [1], which was recently introduced to detect objects in images. Ferns have a very similar behaviour as Forests and, in fact, are completely replaceable - though the important difference lies in the striking evaluation speed for the classification of new samples. 
+We already know about Trees and Forests from the lecture - additionally we read of a Machine Learning algorithm called \textit{Ferns} [1], which was recently introduced to detect objects or key-points in images. Ferns have a very similar behaviour as Forests and, in fact, are completely replaceable - though the important difference lies in the striking evaluation speed for the classification of new samples. 
 
 For object detection purposes, Ferns are built using binary values as feature vector which initially posed a problem for the chosen PUC-Rio Data Set containing continuous (e.g the sensor data) and categorical (e.g gender, names) features. A key point of Ferns is chance so we thought it might serve to randomly choose a threshold within the range of each feature and do a simple comparison, resulting in a new binary feature value - this approach was also used by Miron Bartosz Kursa [2], which encouraged us to continue the implementation.
 
@@ -61,17 +61,17 @@ walking: 43390
 
 \subsection{Ferest}
 
-In this section we describe Ferns as well as \textit{Ferests}, which is a forest of Ferns [1]. We describe methods for training and testing together with the mathematical background and then consider different adjustments that have been made for testing and optimization issues.\\
+In this section we describe Ferns as well as \textit{Ferests}, which are forests of Ferns [1]. We describe methods for training and testing together with the mathematical background and then consider different adjustments that have been made for testing and optimization issues.\\
 
 \subsubsection{Mathematical Background}
 
-Generally, what training is supposed to achieve is a distribution over given feature vectors that classifies a new sample into one of the given classes. In other words, we want to obtain the class which has the highest posterior probability over all class labels, given the specific features of a sample: $\arg\max_k P(C_k \vert f_1,f_2, \cdots ,f_N)$. Applying Bayes' rule results in the following expression: $\arg\max_k P(f_1,f_2, \cdots ,f_N \vert C_k)P(C_k)$, meaning that if we find the joint distribution over all features, we know to which class a sample belongs to - unfortunately, this is very hard to get. Instead, we make the Naive Bayes assumption of independent and identically distributed features which leads us to the first classification formula:
+Generally, what training is supposed to achieve is a distribution over given feature vectors that classifies a new sample into one of the trained classes. In other words, we want to obtain the class which has the highest posterior probability over all class labels, given the specific features of a sample: $\arg\max_k P(C_k \vert f_1,f_2, \cdots ,f_N)$. Applying Bayes' rule results in the following expression: $\arg\max_k P(f_1,f_2, \cdots ,f_N \vert C_k)P(C_k)$, which is proportional to the last expression, meaning that if we find the joint distribution over all features, we know to which class a sample belongs to - unfortunately, this is very hard to get. Instead, we make the Naive Bayes assumption of independent and identically distributed features which leads us to the first classification formula:
 \begin{align*}
 Class(f) \equiv \arg\max_k P(C_k) \prod_{n=1}^N P(f_n\vert C_k)
 \end{align*}
 The assumption that all features in our data set have nothing to do with each other is rather strong and often incorrect. Thus, this usually delivers quite accurate results and is easy and fast to learn.
 
-The idea of a Ferest is to combine joint class-conditional distributions with a Naive assumption to a \textit{Semi-Naive} method which achieves accurate results within a good range of complexity and computational effort. Instead of assuming conditional independence of features, a Ferest $F_l$ uses $L$ Ferns of size $S$ and assumes independence between those. The new and final classification formula is then:
+The idea of a Ferest is to combine joint class-conditional distributions with a Naive assumption to a \textit{Semi-Naive} method which achieves accurate results within a good range of complexity and computational effort. Instead of assuming conditional independence of features, a Ferest uses $L$ randomly built Ferns $F_l$ of size $S$ and assumes independence between those. The new and final classification formula for a Ferest is then:
 \begin{align*}
 Class(f) \equiv \arg\max_k P(C_k) \prod_{l=1}^L P(F_l\vert C_k)
 \end{align*}
@@ -80,22 +80,36 @@ Class(f) \equiv \arg\max_k P(C_k) \prod_{l=1}^L P(F_l\vert C_k)
 
 As described in the section above, a single Fern has to learn the conditional probability distributions for each of the given classes during the training phase, given a certain feature vector $\mathbf{f} = (f_1,f_2, \cdots, f_N)$ of size $N$.
 
-In the original implementation, every Fern randomly selects $S$ features and does a binary test on them, resulting in a binary number between $0$ and $2^S-1$. However, the original implementation was working on image patches to detect objects and the binary tests were picked by comparing two random pixel intensities in the given patch. For our initial implementation, as Kursa [2] suggests, we chose a random threshold within the currently given feature space and compare this threshold with the respective value of each sample.
+In the original implementation, every Fern randomly selects $S$ features and does a binary test on them, resulting in a code that can be read as a binary number between $0$ and $2^S-1$. However, the original implementation was working on image patches to detect objects and the binary tests were picked by comparing two random pixel intensities in the given patch. For our initial implementation, as Kursa [2] suggests, we chose a random threshold within the range of the current feature and compare this threshold with the respective value of each sample.
 
 Like this, we get a decimal number for every training sample by iteratively applying the random tests - this number is then used to put the current sample into one of $2^S$ \textit{buckets}, comparable to hashing.\\
-Using this pattern of dropping samples into buckets for every sample of a class present in the training set delivers a multinomial distribution (\textit{histogram}) of the new features (random binary tests) for the regarded class. This has to be normalized prior to be an actual probability distribution.
+Using this pattern of dropping samples into buckets for every sample of a class that is present in the training set delivers a multinomial distribution (\textit{histogram}) of the new features (random binary tests) for the regarded class. These histograms are then normalized to become an actual probability distribution.
 
 To train a Ferest, we simply train $L$ Ferns and store the specific histograms together with the randomly picked thresholds for the tests.
 
 \subsubsection{Testing}
 
-The classification of a new sample using a single Fern is very efficient: The previously stored tests are applied to the tested sample in the same order to find the bucket into which this sample drops. The combined buckets of all classes, after normalizing, then represent the corresponding class posterior distribution, given the features of the tested sample. This means that every Fern knows with which certainty a sample would be of which class.
+The classification of a new sample using a single Fern is very efficient: The previously stored tests are applied to the tested sample in the same order to find a binary number representing the index of the bucket into which this sample drops. The combined buckets of all classes, after normalizing, then represent the corresponding class posterior distribution given the features of the tested sample. This means that every Fern knows with which certainty a sample would be of which class.
 
-For a Ferest, the results of all Ferns are combined using the Naive Bayes' assumption - which is now more appropriate as all Ferns check on random features and thresholds.
+For a Ferest, the results of all Ferns are combined using the Naive Bayes' assumption - which is now more appropriate as all Ferns check on random features and thresholds. So instead of taking the best vote as a Forest does, a Ferest multiplies all Fern probabilities to find the class that is most likely - as a result, Ferns that were not sure about their classification can be outvoted more easily as each Fern's certainty is incorporated.
 
 \subsubsection{Adjustments}
 
-Trying to achieve more accurate results, 
+Trying to achieve more accurate results, we implemented various versions for the training function of a Fern. In this section, we will explain some of these adjustments.
+
+We found that even for as large numbers of training samples as available in the chosen PUC-Rio data set, it is possible that some of the buckets in a Fern's histograms stay empty. Like this, a single Fern is very selective, resulting in the complete refusal of a new sample possibly being in such an empty bucket. Combining such Ferns to a Ferest results in the rejection of a testing sample when only one of the Ferns decides that the sample is not of this class, even if all other Ferns decide otherwise - this propagates through the multiplication using the Naive Bayes' assumption.\\
+To avoid this, as suggested in [1], we assigned a very low base probability to all buckets in the following fashion:
+\begin{align*}
+p(F_z\vert C_k) = \frac{n_{z,k}+1}{\sum_{z=0}^{2^S-1}(n_{z,k}+1)}
+\end{align*}
+Where $n_{z,k}$ is the number of samples in bucket $z$ after working through the training set for class $C_k$. To avoid the overall undesired selective behaviour of the Ferest, this adjustment was made to all versions of our implementations.\\
+
+Some approaches, that were proposed in [1] suggest to restrict the randomness in the choice of the feature and threshold for the random tests while training. Like this, we move the Fern further away from its key property of randomness for speed and more into \textit{heuristics}.
+
+One method that is known from the lecture on Random Forests is the random selection of feature subsets when training a single Fern. Instead of randomly choosing from any dimension, each Fern can hereby only select from the previously determined subset of features. Another common method is \textit{bagging} - hereby, the data set that a Fern may use for its training phase is randomly drawn from the original set with replacement. Like this, every Fern in a Ferest has different training sets that allow it to be specialised on specific samples.\\
+In addition to bagging and feature subset selection, we designed two heuristic implementations of the training method: \textit{meanRandom} and \textit{bestGini}.\\
+For the first, the only difference to the normal Random Ferest is the way the thresholds for the tests are picked: Instead of uniformly choosing the threshold between minimum and maximum values, the threshold is set to the mean value of two randomly selected samples from the used training set.\\
+\textit{BestGini} includes already a lot of heuristics and actually behaves very similar to a Tree that is using Gini index as impurity measure. Instead of randomly picking the threshold, this method finds the threshold which gives the 'best' result in a sense of good and pure classification when testing on this feature.
 
 
 \section{Results}

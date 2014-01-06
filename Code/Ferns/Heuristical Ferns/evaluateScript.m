@@ -1,6 +1,6 @@
 %% Ferest Tests
 maxDepth = 12;
-maxFerns = 30;
+maxFerns = 10;
 
 randomAccuracies = zeros(maxFerns,maxDepth);
 giniAccuracies = zeros(maxFerns,maxDepth);
@@ -16,7 +16,7 @@ matEnd = '.mat';
 
 
 % try
-    for i = 8:2:maxDepth
+    for i = 10:2:maxDepth
         if i==0
             numTests = 1;
         else
@@ -32,7 +32,7 @@ matEnd = '.mat';
             randomFerest = Ferest(numFerns, numTests);
             tic
             randomFerest = randomFerest.trainMeanRandom(train_data, train_labels);
-            times(1,numTests) = toc
+            times(1,numTests) = toc;
             
             saveString = strcat(startRandomFerestsString,'_',num2str(numTests), ...
                 '_',num2str(numFerns),matEnd);
@@ -51,13 +51,13 @@ matEnd = '.mat';
                 end
             end
             accuracy = accuracy/sum(accuracy);
-            times(3,numTests) = toc
+            times(3,numTests) = toc;
             
             saveString = strcat(startRandomAccuracyString,'_',num2str(numTests), ...
                 '_',num2str(numFerns),matEnd);
             save(saveString,'accuracy','-v7.3');
             
-            randomAccuracies(numFerns,numTests) = accuracy(1)
+            randomAccuracies(numFerns,numTests) = accuracy(1);
             
             
             
@@ -65,7 +65,7 @@ matEnd = '.mat';
             giniFerest = Ferest(numFerns, numTests);
             tic
             giniFerest = giniFerest.trainBestGini(train_data, train_labels);
-            times(2,numTests) = toc
+            times(2,numTests) = toc;
             
             saveString = strcat(startGiniFerestsString,'_',num2str(numTests), ...
                 '_',num2str(numFerns),matEnd);
@@ -89,7 +89,7 @@ matEnd = '.mat';
                 '_',num2str(numFerns),matEnd);
             save(saveString,'accuracy','-v7.3');
             
-            giniAccuracies(numFerns,numTests) = accuracy(1)
+            giniAccuracies(numFerns,numTests) = accuracy(1);
         end
         
         saveString = strcat(startRandomAccuraciesString,'_',num2str(i), ...
