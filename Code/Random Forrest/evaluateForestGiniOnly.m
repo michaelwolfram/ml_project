@@ -3,10 +3,10 @@ stoppingPure = true;
 stoppingNumSamples = 2;
 
 d = 5;
-percentage = 0.01;
+percentage = 0.1;
 
 impurityMeasure = 'gini';
-maxNumTrees = 5;
+maxNumTrees = 20;
 validDepths = [1,2,4,6,8,10,12,15];
 
 accuracies = zeros(maxNumTrees,length(validDepths));
