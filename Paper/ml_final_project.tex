@@ -41,9 +41,11 @@ The programming language of our choice is Matlab - some of the used approaches o
 
 \section{Approach}
 % 'what you did'
-We already know about Trees and Forests from the lecture - additionally we read of a Machine Learning algorithm called \textit{Ferns} [1], which was recently (2007) introduced to detect objects or key-points in images. Ferns have a very similar behaviour as Forests and, in fact, are completely replaceable - though the important difference lies in the striking speed of training a Fern. 
+We already know about Trees and Forests from the lecture - additionally we read of a Machine Learning algorithm called \textit{Ferns} [1], which was recently (2007) introduced to detect objects or keypoints in images. Ferns have a very similar behaviour as Forests and, in fact, are completely replaceable - though the important difference lies in the striking speed for training a Fern. This is the case because a Fern has only $n$ nodes where a Tree has $2^n$ nodes. A Tree can be transformed into a Fern by applying the same tests in every node of a Tree-layer and then 'shrinking' it horizontally to consist of only one node per layer.
 
-For object detection purposes, Ferns are built using binary values as feature vector which initially posed a problem for the chosen PUC-Rio Data Set containing continuous (e.g the sensor data) and categorical (e.g gender, names) features. A key point of Ferns is chance so we thought it might serve to randomly choose a threshold within the range of each feature and do a simple comparison, resulting in a new binary feature value - this approach was also used by Miron Bartosz Kursa [2], which encouraged us to continue the implementation.
+For object detection purposes, Ferns are built using binary values as feature vector which initially posed a problem for the chosen PUC-Rio data set containing continuous (e.g the sensor data) and categorical (e.g gender, names) features. A key point of Ferns is chance so we thought it might serve to randomly choose a threshold within the range of each feature and do a simple comparison, resulting in a new binary feature value - this approach was also used by Kursa [2], which encouraged us to continue the implementation.
+
+The goal of this project is, besides the implementation of the two chosen algorithms, the evaluation of Ferns on data with non-binary attributes. Within the original application area of Ferns (fast keypoint recognition), Ferns outperform Trees. Thus, we wanted to evaluate if this relation also holds true for the given data set. To achieve this, we applied various available methods to optimize the classification accuracy of our algorithms in order to compare Ferns and Trees in full depth.
 
 
 \section{Data}
@@ -93,10 +95,10 @@ Class(f) \equiv \arg\max_k P(C_k) \prod_{l=1}^L P(F_l\vert C_k)
 
 As described in the section above, a single Fern has to learn the conditional probability distributions for each of the given classes during the training phase, given a certain feature vector $\mathbf{f} = (f_1,f_2, \cdots, f_N)$ of size $N$.
 
-In the original implementation, every Fern randomly selects $S$ features and does a binary test on them, resulting in a code that can be read as a binary number between $0$ and $2^S-1$. However, the original implementation was working on image patches to detect objects and the binary tests were picked by comparing two random pixel intensities in the given patch. For our initial implementation, as Kursa [2] suggests, we chose a random threshold within the range of the current feature and compare this threshold with the respective value of each sample.
+In the original implementation, every Fern randomly selects $S$ features and does a binary test on them, resulting in a code that can be read as a binary number between $0$ and $2^S-1$. When comparing this with Trees, each of these tests can be seen as the test that is applied on the previously described 'horizontally' shrunk Tree layer - instead of going left or right in a Tree node, a Fern evaluates all $S$ binary tests leading to the required binary code. However, the original implementation was working on image patches to detect objects and the binary tests were picked by comparing two random pixel intensities in the given patch. For our initial implementation, as Kursa [2] suggests, we chose a random threshold within the range of the current feature and compare this threshold with the respective value of each sample. If the value of a sample is smaller or equal to the selected threshold, the binary test returns true and false otherwise.
 
 Like this, we get a decimal number for every training sample by iteratively applying the random tests - this number is then used to put the current sample into one of $2^S$ \textit{buckets}, comparable to hashing.\\
-Using this pattern of dropping samples into buckets for every sample of a class that is present in the training set delivers a multinomial distribution (\textit{histogram}) of the new features (random binary tests) for the regarded class. These histograms are then normalized to become an actual probability distribution.
+Using this pattern of dropping samples into buckets for every sample of a class that is present in the training set delivers a multinomial distribution (\textit{histogram}) of the new features (binary tests on random thresholds) for the regarded class. These histograms are then normalized to become an actual probability distribution.
 
 To train a Ferest, we simply train $L$ Ferns and store the specific histograms together with the randomly picked thresholds for the tests.
 
@@ -127,9 +129,11 @@ For the first, the only difference to the normal Random Ferest is the way the th
 
 \section{Results}
 
+This section evaluates the numerous experiments that were executed within this project. Benchmarks as well as visualized results are shown for both Forests and Ferests - finally, a detailed comparison between both is given.
+
 \subsection{Forest}
 
-\subsection{Fererst}
+\subsection{Ferest}
 
 \subsection{Comparison}
 
