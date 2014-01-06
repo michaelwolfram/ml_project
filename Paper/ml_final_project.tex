@@ -41,7 +41,7 @@ The programming language of our choice is Matlab - some of the used approaches o
 
 \section{Approach}
 % 'what you did'
-We already know about Trees and Forests from the lecture - additionally we read of a Machine Learning algorithm called \textit{Ferns} [1], which was recently introduced to detect objects in images. Ferns have a very similar behaviour as Forests and, in fact, are completely replaceable - though the important difference lies in the striking evaluation speed for the classification of new samples. 
+We already know about Trees and Forests from the lecture - additionally we read of a Machine Learning algorithm called \textit{Ferns} [1], which was recently (2007) introduced to detect objects in images. Ferns have a very similar behaviour as Forests and, in fact, are completely replaceable, i.e. intentionally building a Tree with the same tests in each layer makes it interchangeable with a Fern containing the same binary tests - though the important difference lies in the striking evaluation speed of Ferns for the classification of new samples. 
 
 For object detection purposes, Ferns are built using binary values as feature vector which initially posed a problem for the chosen PUC-Rio Data Set containing continuous (e.g the sensor data) and categorical (e.g gender, names) features. A key point of Ferns is chance so we thought it might serve to randomly choose a threshold within the range of each feature and do a simple comparison, resulting in a new binary feature value - this approach was also used by Miron Bartosz Kursa [2], which encouraged us to continue the implementation.
 
@@ -56,8 +56,21 @@ walking: 43390
 
 
 \section{Method}
+This section gives a short overview of the properties of both methods. The algorithms and basic methods to tweak them were taken from the original papers (see section ''References'') and some lecture slides but in the final implementation we made some slight changes to cope with the given restrictions of this project.
 
 \subsection{Forest}
+
+\subsubsection{Basic Principle}
+As known from the lecture, we implemented a Forest as ensemble of a certain number of Decision Trees. Our Trees are defined by the following parameters:\\
+First, there is the possibility to prune the tree. Referring to the lecture, since we implemented bagging and feature subset selection for the training of each Tree of a Forest to overcome overfitting on the whole data set pruning as third method became superfluous.\\
+Other properties of a Tree are its criteria when to stop growing. We implemented the four suggested ones from the lecture, i.e. the depth of the tree can be limited to a certain maximum, a lower bound for the benefit of another split can be specified, if the number of training samples in a certain node is below a given threshold it will not be split any more and is marked as leaf and lastly, the tree stops growing at a particular node if the distribution of labels/classes of the training data in this node is pure.\\
+For the last stopping heuristic we implemented the impurity measures Gini index, Entropy and misclassification rate from the lecture. After some small initial tests we decided to concentrate on the Gini index for further testing since the Gini index was more accurate on a subset of the given training data even though the Entropy was slightly faster.\\
+
+
+\subsubsection{Optimizations}
+A Random Forest consists of Trees not trained with exact the same training data. This would
+Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest.\\
+
 
 \subsection{Ferest}
 
