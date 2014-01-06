@@ -30,7 +30,7 @@ hold off;
 % Plot training time.
 figure;
 hold on;
-colors=['y','m','c','r','g','b','w','k'];
+colors=['y','m','c','r','g','b','k','b'];
 for i=1:size(timesTrain_all,1)
     plot(timesTrain_all(i,:),colors(i));
 end
@@ -42,7 +42,7 @@ hold off;
 % Plot testing time.
 figure;
 hold on;
-colors=['y','m','c','r','g','b','w','k'];
+colors=['y','m','c','r','g','b','k','b'];
 for i=1:size(timesTest_all,1)
     plot(timesTest_all(i,:),colors(i));
 end
@@ -135,7 +135,7 @@ accuracies_12 = zeros(1,20);
 timesTrain_12 = zeros(1,20);
 timesTest_12 = zeros(1,20);
 
-for i=1:3
+for i=1:11
     saveString = strcat(startAccuraciesString,'_','gini',...
         '_',num2str(12),'_',num2str(i),'_',matEnd);
     load(saveString);
@@ -171,7 +171,7 @@ hold off;
 
 figure;
 hold on;
-colors=['y','m','c','r','g','b','-b','k'];
+colors=['y','m','c','r','g','b','k','b'];
 for i=1:size(timesTrain_all,1)
     plot(timesTrain_all(i,:),colors(i));
 end
@@ -182,7 +182,7 @@ hold off;
 
 figure;
 hold on;
-colors=['y','m','c','r','g','b','k','b-'];
+colors=['y','m','c','r','g','b','k','b'];
 for i=1:size(timesTest_all,1)
     plot(timesTest_all(i,:),colors(i));
 end

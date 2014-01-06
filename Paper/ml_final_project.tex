@@ -56,20 +56,19 @@ walking: 43390
 
 
 \section{Method}
-This section gives a short overview of the properties of both methods. The algorithms and basic methods to tweak them were taken from the original papers (see section ''References'') and some lecture slides but in the final implementation we made some slight changes to cope with the given restrictions of this project.
+This section gives a short overview of the properties of both methods. The algorithms and basic methods to optimize them were taken from the original papers (see section ''References'') and some lecture slides. In the final implementation we made some slight changes to cope with the given restrictions of this project.
 
 \subsection{Forest}
 
 \subsubsection{Basic Principle}
 As known from the lecture, we implemented a Forest as ensemble of a certain number of Decision Trees. Our Trees are defined by the following parameters:\\
-First, there is the possibility to prune the tree. Referring to the lecture, since we implemented bagging and feature subset selection for the training of each Tree of a Forest to overcome overfitting on the whole data set pruning as third method became superfluous. The second one of the implemented methods induced the number of fea $d$. As\\
-Other properties of a Tree are its criteria when to stop growing. We implemented the four suggested ones from the lecture, i.e. the depth of the tree can be limited to a certain maximum, a lower bound for the benefit of another split can be specified, if the number of training samples in a certain node is below a given threshold it will not be split any more and is marked as leaf and lastly, the tree stops growing at a particular node if the distribution of labels/classes of the training data in this node is pure.\\
-For the last stopping heuristic we implemented the impurity measures Gini index, Entropy and misclassification rate from the lecture. After some small initial tests we decided to concentrate on the Gini index for further testing since the Gini index was more accurate on a subset of the given training data even though the Entropy was slightly faster.\\
-
+We implemented bagging and feature subset selection for the training of each Tree of a Forest to overcome overfitting on the whole data set. When using bagging, the data set that a single Tree may use for its training phase is randomly drawn from the original training set of the Forest with replacement. Therefore, pruning as third method became superfluous. The random selection of feature subsets induces a parameter to the Tree: the number $d<D$ of features, with $D$ being the total number of features, which is used for finding best splits in each node of the Tree.\\
+Other properties of a Tree are its criteria when to stop growing. We implemented the four suggestions from the lecture: The depth of the tree can be limited to a certain maximum. A lower bound for the benefit of another split can be specified. If the number of training samples in a certain node is below a given threshold it will not be split any more and is marked as leaf and lastly, the tree stops growing at a particular node if the distribution of labels/classes of the training data in this node is pure.\\
+For the last stopping heuristic we implemented the impurity measures \textit{Gini index}, \textit{Entropy} and \textit{misclassification rate} as stated in the lecture. After some small initial tests we decided to concentrate on the \textit{Gini index} for further testing since it was more accurate on a subset of the given training data even though the \textit{Entropy} was slightly faster.\\
+We used the same settings for each Tree of a Forest.
 
 \subsubsection{Optimizations}
-A Random Forest consists of Trees not trained with exact the same training data. This would
-Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest.\\
+Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. For the actual choice of parameters refer to the section "Results".
 
 
 \subsection{Ferest}
@@ -119,7 +118,7 @@ Where $n_{z,k}$ is the number of samples in bucket $z$ after working through the
 
 Some approaches, that were proposed in [1] suggest to restrict the randomness in the choice of the feature and threshold for the random tests while training. Like this, we move the Fern further away from its key property of randomness for speed and more into \textit{heuristics}.
 
-One method that is known from the lecture on Random Forests is the random selection of feature subsets when training a single Fern. Instead of randomly choosing from any dimension, each Fern can hereby only select from the previously determined subset of features. Another common method is \textit{bagging} - hereby, the data set that a Fern may use for its training phase is randomly drawn from the original set with replacement. Like this, every Fern in a Ferest has different training sets that allow it to be specialised on specific samples.\\
+One method that is known from the lecture on Random Forests is the random selection of feature subsets when training a single Fern. Instead of randomly choosing from any dimension, each Fern can hereby only select from the previously determined subset of features. Another common method is \textit{bagging}: As indicated above, every Fern in a Ferest then has different training sets that allow it to be specialised on specific samples.\\
 In addition to bagging and feature subset selection, we designed two heuristic implementations of the training method: \textit{meanRandom} and \textit{bestGini}.\\
 For the first, the only difference to the normal Random Ferest is the way the thresholds for the tests are picked: Instead of uniformly choosing the threshold between minimum and maximum values, the threshold is set to the mean value of two randomly selected samples from the used training set.\\
 \textit{BestGini} includes already a lot of heuristics and actually behaves very similar to a Tree that is using Gini index as impurity measure. Instead of randomly picking the threshold, this method finds the threshold which gives the 'best' result in a sense of good and pure classification when testing on this feature.
