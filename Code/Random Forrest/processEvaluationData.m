@@ -122,7 +122,7 @@ accuracies_10 = zeros(1,20);
 timesTrain_10 = zeros(1,20);
 timesTest_10 = zeros(1,20);
 
-for i=1:19
+for i=1:20
     saveString = strcat(startAccuraciesString,'_','gini',...
         '_',num2str(10),'_',num2str(i),'_',matEnd);
     load(saveString);
@@ -131,12 +131,25 @@ for i=1:19
     timesTest_10(i) = Ttest;
 end
 
+accuracies_12 = zeros(1,20);
+timesTrain_12 = zeros(1,20);
+timesTest_12 = zeros(1,20);
+
+for i=1:3
+    saveString = strcat(startAccuraciesString,'_','gini',...
+        '_',num2str(12),'_',num2str(i),'_',matEnd);
+    load(saveString);
+    accuracies_12(i) = accuracy;
+    timesTrain_12(i) = Ttrain;
+    timesTest_12(i) = Ttest;
+end
+
 accuracies_all =...
-    [accuracies_1;accuracies_2;accuracies_4;accuracies_6;accuracies_8;accuracies_10;zeros(1,20);zeros(1,20)];
+    [accuracies_1;accuracies_2;accuracies_4;accuracies_6;accuracies_8;accuracies_10;accuracies_12;zeros(1,20)];
 timesTrain_all =...
-    [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8;timesTrain_10];
+    [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8;timesTrain_10;timesTrain_12];
 timesTest_all =...
-    [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8;timesTest_10];
+    [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8;timesTest_10;timesTest_12];
 
 validDepths = [1,2,4,6,8,10,12,15];
 numTrees = 1:1:20;
@@ -158,7 +171,7 @@ hold off;
 
 figure;
 hold on;
-colors=['y','m','c','r','g','b','w','k'];
+colors=['y','m','c','r','g','b','-b','k'];
 for i=1:size(timesTrain_all,1)
     plot(timesTrain_all(i,:),colors(i));
 end
@@ -169,7 +182,7 @@ hold off;
 
 figure;
 hold on;
-colors=['y','m','c','r','g','b','w','k'];
+colors=['y','m','c','r','g','b','k','b-'];
 for i=1:size(timesTest_all,1)
     plot(timesTest_all(i,:),colors(i));
 end
