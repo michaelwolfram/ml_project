@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.1415926-2.5-1.40.14 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2014.1.6)  6 JAN 2014 20:35
+This is pdfTeX, Version 3.1415926-2.4-1.40.13 (MiKTeX 2.9 64-bit) (preloaded format=pdflatex 2013.9.6)  6 JAN 2014 21:16
 entering extended mode
 **ml_final_project.tex
 
@@ -8,10 +8,10 @@ LaTeX2e <2011/06/27>
 Babel <v3.8m> and hyphenation patterns for english, afrikaans, ancientgreek, ar
 abic, armenian, assamese, basque, bengali, bokmal, bulgarian, catalan, coptic, 
 croatian, czech, danish, dutch, esperanto, estonian, farsi, finnish, french, ga
-lician, german, german-x-2013-05-26, greek, gujarati, hindi, hungarian, iceland
+lician, german, german-x-2012-05-30, greek, gujarati, hindi, hungarian, iceland
 ic, indonesian, interlingua, irish, italian, kannada, kurmanji, latin, latvian,
  lithuanian, malayalam, marathi, mongolian, mongolianlmc, monogreek, ngerman, n
-german-x-2013-05-26, nynorsk, oriya, panjabi, pinyin, polish, portuguese, roman
+german-x-2012-05-30, nynorsk, oriya, panjabi, pinyin, polish, portuguese, roman
 ian, russian, sanskrit, serbian, slovak, slovenian, spanish, swedish, swissgerm
 an, tamil, telugu, turkish, turkmen, ukenglish, ukrainian, uppersorbian, usengl
 ishmax, welsh, loaded.
@@ -34,8 +34,8 @@ File: size10.clo 2007/10/19 v1.4h Standard LaTeX file (size option)
 )
 ("C:\Users\Jonas\Dropbox\Studium\Semester 1\Machine Learning\Project\Body Postu
 re\ml_project\Paper\ml_homework_template.sty"
-(C:\Users\Jonas\AppData\Roaming\MiKTeX\2.9\tex\latex\eso-pic\eso-pic.sty
-Package: eso-pic 2013/10/06 v2.0d eso-pic (RN)
+("C:\Program Files\MiKTeX 2.9\tex\latex\eso-pic\eso-pic.sty"
+Package: eso-pic 2010/10/06 v2.0c eso-pic (RN)
 
 ("C:\Program Files\MiKTeX 2.9\tex\generic\oberdiek\atbegshi.sty"
 Package: atbegshi 2011/10/05 v1.16 At begin shipout hook (HO)
@@ -54,7 +54,7 @@ Package ifpdf Info: pdfTeX in PDF mode is detected.
 Package: keyval 1999/03/16 v1.13 key=value parser (DPC)
 \KV@toks@=\toks14
 )
-(C:\Users\Jonas\AppData\Roaming\MiKTeX\2.9\tex\latex\xcolor\xcolor.sty
+("C:\Program Files\MiKTeX 2.9\tex\latex\xcolor\xcolor.sty"
 Package: xcolor 2007/01/21 v2.11 LaTeX color extensions (UK)
 
 ("C:\Program Files\MiKTeX 2.9\tex\latex\00miktex\color.cfg"
@@ -167,8 +167,7 @@ Package: amsfonts 2013/01/14 v3.01 Basic AMSFonts support
 LaTeX Font Info:    Overwriting math alphabet `\mathfrak' in version `bold'
 (Font)                  U/euf/m/n --> U/euf/b/n on input line 106.
 ))
-("C:\Users\Jonas\Dropbox\Studium\Semester 1\Machine Learning\Project\Body Postu
-re\ml_project\Paper\ml_final_project.aux")
+No file ml_final_project.aux.
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 29.
 LaTeX Font Info:    ... okay on input line 29.
 LaTeX Font Info:    Checking defaults for T1/cmr/m/n on input line 29.
@@ -182,8 +181,7 @@ LaTeX Font Info:    ... okay on input line 29.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 29.
 LaTeX Font Info:    ... okay on input line 29.
 \AtBeginShipoutBox=\box30
-
-(C:\Users\Jonas\AppData\Roaming\MiKTeX\2.9\tex\context\base\supp-pdf.mkii
+("C:\Program Files\MiKTeX 2.9\tex\context\base\supp-pdf.mkii"
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count105
 \scratchdimen=\dimen115
@@ -208,24 +206,49 @@ File: umsb.fd 2013/01/14 v3.01 AMS symbols B
 ) [1
 
 
-{C:/Users/Jonas/AppData/Local/MiKTeX/2.9/pdftex/config/pdftex.map}]
-Underfull \hbox (badness 10000) in paragraph at lines 64--65
+{C:/ProgramData/MiKTeX/2.9/pdftex/config/pdftex.map}]
+Underfull \hbox (badness 1635) in paragraph at lines 64--68
+\OT1/cmr/m/n/10 im-ple-mented bag-ging and fea-ture sub-set
+ []
+
+
+Underfull \hbox (badness 1286) in paragraph at lines 64--68
+\OT1/cmr/m/n/10 a For-est to over-come over-fit-ting on the
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 64--68
 
  []
 
 
-Underfull \hbox (badness 1478) in paragraph at lines 68--69
+Underfull \hbox (badness 1281) in paragraph at lines 71--73
+\OT1/cmr/m/n/10 A Ran-dom For-est con-sists of Trees not
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 71--73
+
+ []
+
+
+Underfull \hbox (badness 10000) in paragraph at lines 77--78
+
+ []
+
+
+Underfull \hbox (badness 1478) in paragraph at lines 81--82
 \OT1/cmr/m/n/10 Generally, what train-ing is sup-posed to
  []
 
 
-Underfull \hbox (badness 3029) in paragraph at lines 68--69
+Underfull \hbox (badness 3029) in paragraph at lines 81--82
 $[] [][] \OML/cmm/m/it/10 P\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 C[]\OMS/cmsy/m/n/1
 0 j\OML/cmm/m/it/10 f[]; f[]; []  ; f[]\OT1/cmr/m/n/10 )$. Ap-ply-ing
  []
 
 
-Underfull \hbox (badness 1320) in paragraph at lines 68--69
+Underfull \hbox (badness 1320) in paragraph at lines 81--82
 \OT1/cmr/m/n/10 sion: $[] [][] \OML/cmm/m/it/10 P\OT1/cmr/m/n/10 (\OML/cmm/m/it
 /10 f[]; f[]; []  ; f[]\OMS/cmsy/m/n/10 j\OML/cmm/m/it/10 C[]\OT1/cmr/m/n/10 )\
 OML/cmm/m/it/10 P\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 C[]\OT1/cmr/m/n/10 )$,
@@ -234,21 +257,17 @@ OML/cmm/m/it/10 P\OT1/cmr/m/n/10 (\OML/cmm/m/it/10 C[]\OT1/cmr/m/n/10 )$,
 [2
 
 ]
-Underfull \hbox (badness 1072) in paragraph at lines 104--106
+Underfull \hbox (badness 1072) in paragraph at lines 117--119
 \OT1/cmr/m/n/10 set for class $\OML/cmm/m/it/10 C[]$\OT1/cmr/m/n/10 . To avoid 
 the over-all
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 104--106
+Underfull \hbox (badness 10000) in paragraph at lines 117--119
 
  []
 
-
-Underfull \vbox (badness 10000) has occurred while \output is active []
-
- [3]
-[4
+[3] [4
 
 ] [5
 
@@ -257,9 +276,9 @@ Underfull \vbox (badness 10000) has occurred while \output is active []
 re\ml_project\Paper\ml_final_project.aux") ) 
 Here is how much of TeX's memory you used:
  2613 strings out of 493921
- 33047 string characters out of 3147283
- 95998 words of memory out of 3000000
- 5902 multiletter control sequences out of 15000+200000
+ 32714 string characters out of 3147283
+ 96982 words of memory out of 3000000
+ 5904 multiletter control sequences out of 15000+200000
  8542 words of font info for 32 fonts, out of 3000000 for 9000
  841 hyphenation exceptions out of 8191
  37i,9n,39p,845b,156s stack positions out of 5000i,500n,10000p,200000b,50000s
@@ -275,7 +294,7 @@ es/MiKTeX 2.9/fonts/type1/public/amsfonts/cm/cmr7.pfb><C:/Program Files/MiKTeX
 s/type1/public/amsfonts/cm/cmsy7.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/p
 ublic/amsfonts/cm/cmti10.pfb><C:/Program Files/MiKTeX 2.9/fonts/type1/public/am
 sfonts/cm/cmtt10.pfb>
-Output written on ml_final_project.pdf (5 pages, 156188 bytes).
+Output written on ml_final_project.pdf (5 pages, 159222 bytes).
 PDF statistics:
  66 PDF objects out of 1000 (max. 8388607)
  0 named destinations out of 1000 (max. 500000)

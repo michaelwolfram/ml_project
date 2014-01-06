@@ -2,3 +2,7 @@
 *.asv
 *.m~
 ~$*
+*.aux
+*.log
+*.pdf
+*.gz

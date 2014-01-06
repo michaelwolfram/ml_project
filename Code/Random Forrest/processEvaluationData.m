@@ -16,9 +16,9 @@ figure;
 hold on;
 imagesc(accuracies);
 colorbar;
-title('Heatmap of accuracies of forests.');
+title('Heatmap of accuracies of forests [%]');
 xlabel('Number of trees');
-ylabel('Class. accuracy [%]');
+ylabel('Depth of trees');
 axis([0.5 20.5 0.5 8.5]);
 axis('image');
 set(gca,'XTick',1:length(numTrees));
@@ -109,7 +109,7 @@ accuracies_8 = zeros(1,20);
 timesTrain_8 = zeros(1,20);
 timesTest_8 = zeros(1,20);
 
-for i=1:14%20
+for i=1:20
     saveString = strcat(startAccuraciesString,'_','gini',...
         '_',num2str(8),'_',num2str(i),'_',matEnd);
     load(saveString);
@@ -118,12 +118,25 @@ for i=1:14%20
     timesTest_8(i) = Ttest;
 end
 
+accuracies_10 = zeros(1,20);
+timesTrain_10 = zeros(1,20);
+timesTest_10 = zeros(1,20);
+
+for i=1:19
+    saveString = strcat(startAccuraciesString,'_','gini',...
+        '_',num2str(10),'_',num2str(i),'_',matEnd);
+    load(saveString);
+    accuracies_10(i) = accuracy;
+    timesTrain_10(i) = Ttrain;
+    timesTest_10(i) = Ttest;
+end
+
 accuracies_all =...
-    [accuracies_1;accuracies_2;accuracies_4;accuracies_6;accuracies_8;zeros(1,20);zeros(1,20);zeros(1,20)];
+    [accuracies_1;accuracies_2;accuracies_4;accuracies_6;accuracies_8;accuracies_10;zeros(1,20);zeros(1,20)];
 timesTrain_all =...
-    [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8];
+    [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8;timesTrain_10];
 timesTest_all =...
-    [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8];
+    [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8;timesTest_10];
 
 validDepths = [1,2,4,6,8,10,12,15];
 numTrees = 1:1:20;
@@ -132,9 +145,9 @@ figure;
 hold on;
 imagesc(accuracies_all);
 colorbar;
-title('Heatmap of accuracies of forests.');
+title('Heatmap of accuracies of forests [%]');
 xlabel('Number of trees');
-ylabel('Class. accuracy [%]');
+ylabel('Depth of trees');
 axis([0.5 20.5 0.5 8.5]);
 axis('image');
 set(gca,'XTick',1:length(numTrees));
