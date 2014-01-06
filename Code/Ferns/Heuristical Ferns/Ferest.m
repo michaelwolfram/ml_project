@@ -26,7 +26,7 @@ classdef Ferest
             obj.numTests = numTests;
         end
         
-        function obj = trainRandom(obj, train_data, train_labels)
+        function obj = trainMeanRandom(obj, train_data, train_labels)
             numTrainData = length(train_data);
             [obj.classes,~,~]=unique(train_labels);
             
@@ -36,13 +36,34 @@ classdef Ferest
                 train_data = train_data(permutationWithReplacement,:);
                 train_labels = train_labels(permutationWithReplacement,:);
                 
-                [~, ii] = sort(train_data(:,size(train_data,2)));
-                train_data = train_data(ii,:);
                 [~, ii] = sort(train_labels);
                 train_labels = train_labels(ii);
+                train_data = train_data(ii,:);
+                
+                
+                obj.fernList{i} = obj.fernList{i}.trainMeanRandom(train_data, train_labels);
+                obj.testLists{i} = obj.fernList{i}.testList;
+                obj.histogramList{i} = obj.fernList{i}.histograms;
+            end
+            
+        end
+        
+        function obj = trainBestGini(obj, train_data, train_labels)
+            numTrainData = length(train_data);
+            [obj.classes,~,~]=unique(train_labels);
+            
+            for i = 1:obj.numFerns
+                permutationWithReplacement = randi(numTrainData,1,numTrainData);
+                
+                train_data = train_data(permutationWithReplacement,:);
+                train_labels = train_labels(permutationWithReplacement,:);
+                
+                [~, ii] = sort(train_labels);
+                train_labels = train_labels(ii);
+                train_data = train_data(ii,:);
                 
                 obj.fernList{i} = obj.fernList{i}. ...
-                    trainRandom(train_data, train_labels);
+                    trainBestGini(train_data, train_labels);
                 obj.testLists{i} = obj.fernList{i}.testList;
                 obj.histogramList{i} = obj.fernList{i}.histograms;
             end
