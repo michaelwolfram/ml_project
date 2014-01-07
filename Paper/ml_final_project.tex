@@ -159,6 +159,8 @@ Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 
 
 \subsection{Ferest}
 
+\subsubsection{Random Ferest}
+
 First, we tested the original implementation of Ferests which is very fast to train and still very accurate even for its random tests on random features:
 
 It is recognizable that the accuracy of a Ferest tends to increase with increasing number of Ferns and their depths (see Figure \ref{ferest_heatmap}). In Figure \ref{ferest_accuracies} one can see that there is a limit for the best accuracy a Ferest with Ferns of a certain depth can reach - even for up to a hundred Ferns, the best result that could be achieved on the given setup for our data set was around 88\%. This means that a Ferest stops improving once it reaches its maximum accuracy but rather than giving worse results it reaches a plateau and stays there. The largest improvements for this implementation were found within the range of the first ten Ferns in a Ferest.\\
@@ -186,6 +188,15 @@ Due to restrictions in time and computation power, we could neither further incr
 \caption{Accuracies of a Ferest for large numbers of Ferns}
 \label{ferest_accuracies}
 \end{figure}
+
+\subsubsection{Optimized Implementations}
+
+Additionally to the original 'completely' random version of the Ferest, we implemented \textit{bestGini} and \textit{meanRandom}. But where training of a single Fern of the same depth took only 15 seconds for 'random' implementations, it already lasted 20 minutes for the heuristical option incorporating costs with Gini as impurity measure. Nevertheless, \textit{bestGini} was still faster for the training by orders of magnitude (see next section about Comparison).
+
+\begin{tabular}{p{3cm}|p{3cm}|p{5cm}|p{5cm}|p{5cm}}
+Depth & #Ferns & \textit{random} & \textit{meanRandom} & \textit{bestGini}\\
+8 	& 1 	& 0 	& 66.26\% 	& 73.25\% \\
+\end{tabular}
 
 \subsection{Comparison}
 
