@@ -144,23 +144,29 @@ Figure \ref{forest_heatmap} and Figure \ref{forest_testing_time} show our result
 The accuracy of the Forests was evaluated for the depths 2 ,4, 6, 8, 10, 12 and 15. On the one hand, one can see in Figure \ref{forest_heatmap} that for an increasing number of Trees in a Forest its accuracy increases in the beginning but then starts to stagnate. On the other hand, the more interesting observation is that with a depth of 6 a maximum accuracy is achieved and larger depths do not lead to better results event though with a configuration of depth 15 and 20 Trees a little tendency of increase is noticeable. Being aware of the fact that this cut of increase of accuracy should be somewhere else for the complete training set, we suppose that this indicates some kind of overfitting since the depth of the Trees reaches a questionable size in relation to the relatively small training data set.\\
 Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 testing data samples. The expected linearity between the number of Trees in a Forest and the time for evaluation is totally reflected in the diagram. Moreover, our results reflect the increase of testing time among growing depths of the Trees of a Forest.
 
-\onecolumn
+\subsubsection{Training on the whole training data set}
+For the second part of the analysis of the Forests we fixed the depth of the Forest's Trees to 6, only built one Forest with 18 Trees and trained it on the whole training data set. The mean training time for one Tree of the Forest is 6479 seconds. The accuracy of this Forest on the whole testing data is depicted in Figure \ref{forest_heatmap_all}. As described above, we suppose that there is a dependence between the size of the training data set and the 'optimal' depth of the Trees. Thus, we evaluated the $100\%$ of the training data set on a Forest with Trees of depth 6 since depth 6 performed best for $10\%$ of the training data. As shown in Figure \ref{forest_heatmap_all} the result is quite worse, leading us to the assumption that for the whole training data this 'optimal' depth has changed. Nevertheless, it was not feasible to evaluate other depths.
+
 \begin{figure}[t] 
 \centering
-\includegraphics[width=\textwidth]{Diagrams/Forests_Heatmap_Gini_15_20}
-\caption{Accuracies of a Forest depending on its number of Trees and the depth of its\\\phantom{Figure 1: }Trees.}
+\includegraphics[angle=90]{Diagrams/Forests_Heatmap_Gini_15_20}
+\caption{Accuracies of a Forest depending on its number of Trees and the depth of its\\\phantom{Figure 1: }Trees. The Forests were trained on $10\%$ of the training data.}
 \label{forest_heatmap}
 \end{figure}
+
 \begin{figure}[t] 
 \centering
-\includegraphics{Diagrams/Forests_Testing_Times_Gini_15_20}
+\includegraphics[width=0.49\textwidth]{Diagrams/Forests_Testing_Times_Gini_15_20}
 \caption{Testing time of a Forest on the whole testing data set depending on its number\\\phantom{Figure 2: }of Trees. The data was evaluated for five different depths of the Trees of a Forest.}
 \label{forest_testing_time}
 \end{figure}
-\twocolumn
 
-
-
+\begin{figure}[t] 
+\centering
+\includegraphics[angle=90]{Diagrams/Heatmap}
+\caption{Accuracies of a Forest depending on its number of Trees and the depth of its\\\phantom{Figure 1: }Trees. The Forest was trained on $100\%$ of the training data.}
+\label{forest_heatmap_all}
+\end{figure}
 
 
 \subsection{Ferest}
