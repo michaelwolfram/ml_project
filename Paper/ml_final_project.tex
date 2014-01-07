@@ -50,24 +50,18 @@ The goal of this project is, besides the implementation of the two chosen algori
 
 
 \section{Data}
-The provided data set consists of 165633 samples of recorded body postures and movements. On the one hand the features contain information about the humans themselves: name, gender, age, height, weight and body-mass-index. On the other hand sensor readings of accelerometers from human joints are included. This results in a total of 18 features.\\
-The possible postures of the subjects are: 'sitting', 'sittingdown', 'standing', 'standingup' and 'walking'. The distribution of the data set among these classes is as follows:\\\\
-\begin{tabular}{p{2cm}p{2cm}}
-'sitting': & 50631\\
-'sittingdown': & 11827\\
-'standing': & 47370\\
-'standingup': & 12415\\
-'walking': & 43390
-\end{tabular}\\\\
-Given that unequal distribution we selected not just a certain number but rather a particular percentage of randomly drawn data samples from each class for the testing set as stated in the project description. We used the usual partition of $\frac{2}{3}, \frac{1}{3}$ for the training and testing set.\\
-During the evaluation of Forests we were faced with limitations regarding time and computation power. Therefore, we were forced to make a decision whether to evaluate Forests on the whole provided data set or to analyse Forests for a broader variety of combinations of their parameters. Since we consider the latter to be more important we decided to do the majority of our analysis of Forests on $10\%$ of the data set.
+sitting: 50631
+sittingdown: 11827
+standing: 47370
+standingup: 12415
+walking: 43390
+
 
 
 \section{Method}
 This section gives a short overview of the properties of both methods. The algorithms and basic methods to optimize them were taken from the original papers (see section ''References'') and some lecture slides. In the final implementation we made some slight changes to cope with the given restrictions of this project.
 
 \subsection{Forest}
-This section concisely describes key facts of our implementation of Forests.
 
 \subsubsection{Basic Principle}
 As known from the lecture, we implemented a Forest as ensemble of a certain number of Decision Trees. Our Trees are defined by the following parameters:\\
@@ -141,14 +135,32 @@ This section evaluates the numerous experiments that were executed within this p
 
 \subsection{Ferest}
 
-It is recognizable that the accuracy of a Ferest tends to increase with increasing number of of Ferns and their depth (see Figure \ref{ferest_heatmap}). 
+First, we tested the original implementation of Ferests which is very fast to train and still very accurate even for its random tests on random features:
+
+It is recognizable that the accuracy of a Ferest tends to increase with increasing number of Ferns and their depths (see Figure \ref{ferest_heatmap}). In Figure \ref{ferest_accuracies} one can see that there is a limit for the best accuracy a Ferest with Ferns of a certain depth can reach - even for up to a hundred Ferns, the best result that could be achieved on the given setup for our data set was around 88\%. This means that a Ferest stops improving once it reaches its maximum accuracy but rather than giving worse results it reaches a plateau and stays there. The largest improvements for this implementation were found within the range of the first ten Ferns in a Ferest.\\
+Also, in Figure \ref{ferest_accuracies} the influence of chance can be seen when looking at the plots for depths one and two. Due to the choice of a random threshold, it is possible to choose a bad value or feature. This leads to the depicted unsteady behaviour - especially for Ferests with low depths this effect is quite strong. The same characteristic can be seen in Figure \ref{ferest_heatmap}, e.g. for depth 6 and 25 Ferns in the structure. This effect seems to dissolve the deeper a Fern becomes.
+
+Nevertheless, the depth of a Fern can also become critical when chosen too large. Where Trees tend to overfit for such settings, the number of buckets for the histograms of a Fern increases dramatically. Accordingly, very few samples drop into each bucket while training and therefore, the class-conditional probability distribution is close to being uniform. Informally, every Fern is then uncertain to which class a new sample might belong.\\
+This shows that when increasing the depth of a Ferest, the number of samples in the training set should increase exponentially - for our chosen training set, the best depth seems to be ten.
 
 \begin{figure}[h] 
 \centering
-\hspace{-8mm} 
-\includegraphics[width=7.5cm]{Diagrams/heatmap_randFerns_16_30}
-\caption{Accuracies of a Ferest with different depths and number of Ferns}
+\includegraphics[width=0.49\textwidth]{Diagrams/heatmap_randFerns_16_30}
+\caption{Heatmap for accuracies of a Ferest with different depths and numbers of Ferns}
 \label{ferest_heatmap}
+\end{figure}
+
+Due to restrictions in time and computation power, we could neither further increase the depth of the used Ferns nor the number of Ferns. But for single samples the following assumptions were confirmed: 
+\begin{itemize}
+\item After reaching a certain depth, a tendency of decreasing accuracies occurs
+\item For depths that are higher than a certain threshold, classification accuracy steadily increases for larger Fern-numbers until it stagnates at a certain value
+\end{itemize} 
+
+\begin{figure}[h] 
+\centering
+\includegraphics[width=0.49\textwidth]{Diagrams/accuracies_RandFerns_12_70}
+\caption{Accuracies of a Ferest for large numbers of Ferns}
+\label{ferest_accuracies}
 \end{figure}
 
 \subsection{Comparison}

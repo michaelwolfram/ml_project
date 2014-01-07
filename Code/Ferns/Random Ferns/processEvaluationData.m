@@ -14,7 +14,7 @@ numTrees = [1,5,10,15,20,25,30];
 % Plot heatmap.
 figure;
 hold on;
-imagesc(accuraciesALL);
+imagesc(accuraciesALL');
 colorbar;
 title('Heatmap of accuracies of Ferests [%]');
 xlabel('Number of Ferns');
