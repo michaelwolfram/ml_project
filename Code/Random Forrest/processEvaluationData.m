@@ -135,7 +135,7 @@ accuracies_12 = zeros(1,20);
 timesTrain_12 = zeros(1,20);
 timesTest_12 = zeros(1,20);
 
-for i=1:19
+for i=1:20
     saveString = strcat(startAccuraciesString,'_','gini',...
         '_',num2str(12),'_',num2str(i),'_',matEnd);
     load(saveString);
@@ -144,12 +144,25 @@ for i=1:19
     timesTest_12(i) = Ttest;
 end
 
+accuracies_15 = zeros(1,20);
+timesTrain_15 = zeros(1,20);
+timesTest_15 = zeros(1,20);
+
+for i=1:20
+    saveString = strcat(startAccuraciesString,'_','gini',...
+        '_',num2str(15),'_',num2str(i),'_',matEnd);
+    load(saveString);
+    accuracies_15(i) = accuracy;
+    timesTrain_15(i) = Ttrain;
+    timesTest_15(i) = Ttest;
+end
+
 accuracies_all =...
-    [accuracies_1;accuracies_2;accuracies_4;accuracies_6;accuracies_8;accuracies_10;accuracies_12;zeros(1,20)];
+    [accuracies_1;accuracies_2;accuracies_4;accuracies_6;accuracies_8;accuracies_10;accuracies_12;accuracies_15];
 timesTrain_all =...
-    [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8;timesTrain_10;timesTrain_12];
+    [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8;timesTrain_10;timesTrain_12;timesTrain_15];
 timesTest_all =...
-    [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8;timesTest_10;timesTest_12];
+    [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8;timesTest_10;timesTest_12;timesTest_15];
 
 validDepths = [1,2,4,6,8,10,12,15];
 numTrees = 1:1:20;

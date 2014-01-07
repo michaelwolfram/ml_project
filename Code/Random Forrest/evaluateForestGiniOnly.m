@@ -17,9 +17,9 @@ startAccuraciesString = 'Evaluation_Forests/Gini_only/accuracy';
 matEnd = '.mat';
 
 try
-    for i = 1:length(validDepths)
+%     for i = 1:length(validDepths)
         % Select current maximum height of each tree.
-        maxHeight = validDepths(i);
+        maxHeight = 15;%validDepths(i);
         forest = Forest(0,percentage,d,impurityMeasure,'p',stoppingPure,...
             'd',maxHeight,'s',stoppingNumSamples);
         
@@ -45,15 +45,15 @@ try
             Ttest=toc
             accuracy = correct/numDataPoints;
 
-            accuracies(currNumTrees,i) = accuracy;
-            trainTimes(currNumTrees,i) = Ttrain;
-            testTimes(currNumTrees,i) = Ttest;
+%             accuracies(currNumTrees,i) = accuracy;
+%             trainTimes(currNumTrees,i) = Ttrain;
+%             testTimes(currNumTrees,i) = Ttest;
 
             saveString = strcat(startAccuraciesString,'_',impurityMeasure,...
                 '_',num2str(maxHeight),'_',num2str(currNumTrees),'_',matEnd);
             save(saveString,'accuracy','Ttrain','Ttest','-v7.3');
         end
-    end
+%     end
 catch exc
     getReport(exc)
     saveString = strcat(startAccuraciesString,'_',impurityMeasure,...
@@ -61,6 +61,6 @@ catch exc
     save(saveString,'accuracies','trainTimes','testTimes','-v7.3');
 end
 
-saveString = strcat(startAccuraciesString,'_',num2str(i), ...
+saveString = strcat(startAccuraciesString,'_',impurityMeasure, ...
     '_',num2str(0),'_',num2str(currNumTrees),'_all_final',matEnd);
 save(saveString,'accuracies','trainTimes','testTimes','-v7.3');
