@@ -144,49 +144,93 @@ Figure \ref{forest_heatmap} and Figure \ref{forest_testing_time} show our result
 The accuracy of the Forests was evaluated for the depths 2 ,4, 6, 8, 10, 12 and 15. On the one hand, one can see in Figure \ref{forest_heatmap} that for an increasing number of Trees in a Forest its accuracy increases in the beginning but then starts to stagnate. On the other hand, the more interesting observation is that with a depth of 6 a maximum accuracy is achieved and larger depths do not lead to better results event though with a configuration of depth 15 and 20 Trees a little tendency of increase is noticeable. Being aware of the fact that this cut of increase of accuracy should be somewhere else for the complete training set, we suppose that this indicates some kind of overfitting since the depth of the Trees reaches a questionable size in relation to the relatively small training data set.\\
 Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 testing data samples. The expected linearity between the number of Trees in a Forest and the time for evaluation is totally reflected in the diagram. Moreover, our results reflect the increase of testing time among growing depths of the Trees of a Forest.
 
-\onecolumn
+\subsubsection{Training on the whole training data set}
+For the second part of the analysis of the Forests we fixed the depth of the Forest's Trees to 6, only built one Forest with 18 Trees and trained it on the whole training data set. The mean training time for one Tree of the Forest is 6479 seconds. The accuracy of this Forest on the whole testing data is depicted in Figure \ref{forest_heatmap_all}. As described above, we suppose that there is a dependence between the size of the training data set and the 'optimal' depth of the Trees. Thus, we evaluated the $100\%$ of the training data set on a Forest with Trees of depth 6 since depth 6 performed best for $10\%$ of the training data. As shown in Figure \ref{forest_heatmap_all} the result is quite worse, leading us to the assumption that for the whole training data this 'optimal' depth has changed. Nevertheless, it was not feasible to evaluate other depths.
+
 \begin{figure}[t] 
 \centering
-\includegraphics[width=\textwidth]{Diagrams/Forests_Heatmap_Gini_15_20}
-\caption{Accuracies of a Forest depending on its number of Trees and the depth of its\\\phantom{Figure 1: }Trees.}
+\includegraphics[angle=90]{Diagrams/Forests_Heatmap_Gini_15_20}
+\caption{Accuracies of a Forest depending on its number of Trees and the depth of its\\\phantom{Figure 1: }Trees. The Forests were trained on $10\%$ of the training data.}
 \label{forest_heatmap}
 \end{figure}
+
 \begin{figure}[t] 
 \centering
-\includegraphics{Diagrams/Forests_Testing_Times_Gini_15_20}
+\includegraphics[width=0.49\textwidth]{Diagrams/Forests_Testing_Times_Gini_15_20}
 \caption{Testing time of a Forest on the whole testing data set depending on its number\\\phantom{Figure 2: }of Trees. The data was evaluated for five different depths of the Trees of a Forest.}
 \label{forest_testing_time}
 \end{figure}
-\twocolumn
 
-
-
+\begin{figure}[t] 
+\centering
+\includegraphics[angle=90]{Diagrams/Heatmap}
+\caption{Accuracies of a Forest depending on its number of Trees and the depth of its\\\phantom{Figure 1: }Trees. The Forest was trained on $100\%$ of the training data.}
+\label{forest_heatmap_all}
+\end{figure}
 
 
 \subsection{Ferest}
 
-<<<<<<< HEAD
-It is recognizable that the accuracy of a Ferest tends to increase with increasing number of of Ferns and their depth (see Figure \ref{ferest_heatmap}). 
-=======
 \subsubsection{Random Ferest}
 
 First, we tested the original implementation of Ferests which is very fast to train and still very accurate even for its random tests on random features:
->>>>>>> 4124e38e4405a0e9353e7b7fdb14f4ed8e041864
 
-%\begin{figure}[h] 
-%\centering
-%\hspace{-8mm} 
-%\includegraphics[width=7.5cm]{Diagrams/heatmap_randFerns_16_30}
-%\caption{Accuracies of a Ferest with different depths and number of Ferns}
-%\label{ferest_heatmap}
-%\end{figure}
+It is recognizable that the accuracy of a Ferest tends to increase with increasing number of Ferns and their depths (see Figure \ref{ferest_heatmap}). In Figure \ref{ferest_accuracies} one can see that there is a limit for the best accuracy a Ferest with Ferns of a certain depth can reach - even for up to a hundred Ferns, the best result that could be achieved on the given setup for our data set was around 88\%. This means that a Ferest stops improving once it reaches its maximum accuracy but rather than giving worse results it reaches a plateau and stays there. The largest improvements for this implementation were found within the range of the first ten Ferns in a Ferest.\\
+Also, in Figure \ref{ferest_accuracies} the influence of chance can be seen when looking at the plots for depths one and two. Due to the choice of a random threshold, it is possible to choose a bad value or feature. This leads to the depicted unsteady behaviour - especially for Ferests with low depths this effect is quite strong. The same characteristic can be seen in Figure \ref{ferest_heatmap}, e.g. for depth 6 and 25 Ferns in the structure. This effect seems to dissolve the deeper a Fern becomes.
+
+Nevertheless, the depth of a Fern can also become critical when chosen too large. Where Trees tend to overfit for such settings, the number of buckets for the histograms of a Fern increases dramatically. Accordingly, very few samples drop into each bucket while training and therefore, the class-conditional probability distribution is close to being uniform. Informally, every Fern is then uncertain to which class a new sample might belong.\\
+This shows that when increasing the depth of a Ferest, the number of samples in the training set should increase exponentially - for our chosen training set, the best depth seems to be ten.
+
+\begin{figure}[h] 
+\centering
+\includegraphics[width=0.49\textwidth]{Diagrams/heatmap_randFerns_16_30}
+\caption{Heatmap for accuracies of a Ferest with different depths and numbers of Ferns}
+\label{ferest_heatmap}
+\end{figure}
+
+Due to restrictions in time and computation power, we could neither further increase the depth of the used Ferns nor the number of Ferns. But for single samples the following assumptions were confirmed: 
+\begin{itemize}
+\item After reaching a certain depth, a tendency of decreasing accuracies occurs
+\item For depths that are higher than a certain threshold, classification accuracy steadily increases for larger Fern-numbers until it stagnates at a certain value
+\end{itemize} 
+
+\begin{figure}[h] 
+\centering
+\includegraphics[width=0.49\textwidth]{Diagrams/accuracies_RandFerns_12_70}
+\caption{Accuracies of a Ferest for large numbers of Ferns}
+\label{ferest_accuracies}
+\end{figure}
 
 \subsubsection{Optimized Implementations}
 
 Additionally to the original 'completely' random version of the Ferest, we implemented \textit{bestGini} and \textit{meanRandom}. But where training of a single Fern of the same depth took only 15 seconds for 'random' implementations, it already lasted 20 minutes for the heuristical option incorporating costs with Gini as impurity measure. Nevertheless, \textit{bestGini} was still faster for the training by orders of magnitude (see next section about Comparison).
 
-When comparing the classification accuracies of the three different versions that were implemented, in line with expectations, bestGini most often gives the best result (see Table \ref{ferest_versions}). One can see that for larger numbers of Ferns per Ferest, all three implementations deliver comparable outcomes, whereas bestGini generally gives the best initial result for single Ferns. Surprisingly, meanRandom achieves much better accuracies than the original random version - this might be the case because it applies a rather strict assumption on
+When comparing the classification accuracies of the three different versions that were implemented, in line with expectations, bestGini most often gives the best result (see Table \ref{ferest_versions}). One can see that for larger numbers of Ferns per Ferest, all three implementations deliver comparable outcomes, whereas bestGini generally gives the best initial result for single Ferns. Surprisingly, meanRandom achieves much better accuracies than the original random version. We suppose the following explanation for this phenomenon:\\
+Firstly, taking the mean of two random values for certain feature dimensions is still a random choice, so it is comprehensible that \textit{meanRandom} should not achieve worse accuracies than pure random. The reason for the advance probably is of statistical origin - when having a fixed feature dimension with minimum and maximum value there must be some areas where samples of a certain class accumulate. If this was not the case for all dimensions, it would generally be impossible to successfully learn appropriate distributions. Assuming we need to find a threshold for a feature where the class distribution resembles the sample distribution (meaning that there are different areas that are common for samples of a specific class). When we pick only one random value from those samples, the chance to pick a sample that is in the middle of such a 'crowded' class-area is comparably high - resulting in a split that separates the class evenly (this is not desired). If we pick two values instead, the chance of taking two samples from different class-specific regions is comparably high. Like this, we split this feature in the middle between the two regions and thereby, most probably, also split the two related classes. Therefore, if we combine enough Ferns on hopefully distinctive features, the output will be a very good classification.
 
+<<<<<<< HEAD
+%\begin{tabular}{c|c||c|c|c}
+%\textit{D} & \textit{N} & \textit{rnd} & \textit{mean} & \textit{Gini}\\
+%\hline
+%\hline
+%8 	& 1 	& 53.34\% 	& 66.26\% 	& 73.25\% \\
+% 	& 5 	& 59.72\% 	& 79.82\%	& 81.20\% \\
+% 	& 10 	& 76.64\% 	& 86.52\%	& 83.80\% \\
+% 	& 15 	& 80.59\% 	& 86.34\%	& 82.68\% \\
+% 	& 20 	& 77.30\% 	& 85.65\%	& 86.93\% \\
+%\hline
+%10 	& 1 	& 51.68\% 	& 60.66\%	& 62.05\% \\
+% 	& 5 	& 75.96\% 	& 77.09\%	& 78.69\% \\
+% 	& 10 	& 77.41\% 	& 86.63\%	& 81.97\% \\
+%\hline
+%12 	& 1 	& 63.03\% 	& 41.31\%	& 53.33\% \\
+% 	& 5 	& 79.66\% 	& 74.68\%	& 76.19\% \\
+% 	& 10 	& 81.81\% 	& 88.38\%	& 81.42\% \\
+%\caption{Accuracies of a Ferest with depth \textit{D}, number of Ferns \textit{N} for original random, meanRandom and bestGini implementations}
+%\label{ferest_versions}
+%\end{tabular}
+=======
+\begin{table}
 \begin{tabular}{c|c||c|c|c}
 \textit{D} & \textit{N} & \textit{rnd} & \textit{mean} & \textit{Gini}\\
 \hline
@@ -203,10 +247,12 @@ When comparing the classification accuracies of the three different versions tha
 \hline
 12 	& 1 	& 63.03\% 	& 41.31\%	& 53.33\% \\
  	& 5 	& 79.66\% 	& 74.68\%	& 76.19\% \\
- 	& 10 	& 81.81\% 	& 88.38\%	& 81.42\% \\
-\caption{Accuracies of a Ferest with depth \textit{D}, number of Ferns \textit{N} for original random, meanRandom and bestGini implementations}
-\label{ferest_versions}
+ 	& 10 	& 81.81\% 	& 88.38\%	& 81.42\% 
 \end{tabular}
+\caption{Accuracies of a Ferest with depth \textit{D}, number of Ferns \textit{N} for original \textit{random}, \textit{meanRandom} and \textit{bestGini} implementations}
+\label{ferest_versions}
+\end{table}
+>>>>>>> 99d52d25661cff9e5f13c859028a0f8b780ae9b4
 
 \subsection{Comparison}
 

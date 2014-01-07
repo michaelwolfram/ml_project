@@ -199,31 +199,28 @@ Due to restrictions in time and computation power, we could neither further incr
 
 Additionally to the original 'completely' random version of the Ferest, we implemented \textit{bestGini} and \textit{meanRandom}. But where training of a single Fern of the same depth took only 15 seconds for 'random' implementations, it already lasted 20 minutes for the heuristical option incorporating costs with Gini as impurity measure. Nevertheless, \textit{bestGini} was still faster for the training by orders of magnitude (see next section about Comparison).
 
-When comparing the classification accuracies of the three different versions that were implemented, in line with expectations, bestGini most often gives the best result (see Table \ref{ferest_versions}). One can see that for larger numbers of Ferns per Ferest, all three implementations deliver comparable outcomes, whereas bestGini generally gives the best initial result for single Ferns. Surprisingly, meanRandom achieves much better accuracies than the original random version. We suppose the following explanation for this phenomenon:\\
-Firstly, taking the mean of two random values for certain feature dimensions is still a random choice, so it is comprehensible that \textit{meanRandom} should not achieve worse accuracies than pure random. The reason for the advance probably is of statistical origin - when having a fixed feature dimension with minimum and maximum value there must be some areas where samples of a certain class accumulate. If this was not the case for all dimensions, it would generally be impossible to successfully learn appropriate distributions. Assuming we need to find a threshold for a feature where the class distribution resembles the sample distribution (meaning that there are different areas that are common for samples of a specific class). When we pick only one random value from those samples, the chance to pick a sample that is in the middle of such a 'crowded' class-area is comparably high - resulting in a split that separates the class evenly (this is not desired). If we pick two values instead, the chance of taking two samples from different class-specific regions is comparably high. Like this, we split this feature in the middle between the two regions and thereby, most probably, also split the two related classes. Therefore, if we combine enough Ferns on hopefully distinctive features, the output will be a very good classification.
+When comparing the classification accuracies of the three different versions that were implemented, in line with expectations, bestGini most often gives the best result (see Table \ref{ferest_versions}). One can see that for larger numbers of Ferns per Ferest, all three implementations deliver comparable outcomes, whereas bestGini generally gives the best initial result for single Ferns. Surprisingly, meanRandom achieves much better accuracies than the original random version - this might be the case because it applies a rather strict assumption on
 
-\begin{table}
-\begin{tabular}{c|c||c|c|c}
-\textit{D} & \textit{N} & \textit{rnd} & \textit{mean} & \textit{Gini}\\
-\hline
-\hline
-8 	& 1 	& 53.34\% 	& 66.26\% 	& 73.25\% \\
- 	& 5 	& 59.72\% 	& 79.82\%	& 81.20\% \\
- 	& 10 	& 76.64\% 	& 86.52\%	& 83.80\% \\
- 	& 15 	& 80.59\% 	& 86.34\%	& 82.68\% \\
- 	& 20 	& 77.30\% 	& 85.65\%	& 86.93\% \\
-\hline
-10 	& 1 	& 51.68\% 	& 60.66\%	& 62.05\% \\
- 	& 5 	& 75.96\% 	& 77.09\%	& 78.69\% \\
- 	& 10 	& 77.41\% 	& 86.63\%	& 81.97\% \\
-\hline
-12 	& 1 	& 63.03\% 	& 41.31\%	& 53.33\% \\
- 	& 5 	& 79.66\% 	& 74.68\%	& 76.19\% \\
- 	& 10 	& 81.81\% 	& 88.38\%	& 81.42\% 
-\end{tabular}
-\caption{Accuracies of a Ferest with depth \textit{D}, number of Ferns \textit{N} for original \textit{random}, \textit{meanRandom} and \textit{bestGini} implementations}
-\label{ferest_versions}
-\end{table}
+%\begin{tabular}{c|c||c|c|c}
+%\textit{D} & \textit{N} & \textit{rnd} & \textit{mean} & \textit{Gini}\\
+%\hline
+%\hline
+%8 	& 1 	& 53.34\% 	& 66.26\% 	& 73.25\% \\
+% 	& 5 	& 59.72\% 	& 79.82\%	& 81.20\% \\
+% 	& 10 	& 76.64\% 	& 86.52\%	& 83.80\% \\
+% 	& 15 	& 80.59\% 	& 86.34\%	& 82.68\% \\
+% 	& 20 	& 77.30\% 	& 85.65\%	& 86.93\% \\
+%\hline
+%10 	& 1 	& 51.68\% 	& 60.66\%	& 62.05\% \\
+% 	& 5 	& 75.96\% 	& 77.09\%	& 78.69\% \\
+% 	& 10 	& 77.41\% 	& 86.63\%	& 81.97\% \\
+%\hline
+%12 	& 1 	& 63.03\% 	& 41.31\%	& 53.33\% \\
+% 	& 5 	& 79.66\% 	& 74.68\%	& 76.19\% \\
+% 	& 10 	& 81.81\% 	& 88.38\%	& 81.42\% \\
+%\caption{Accuracies of a Ferest with depth \textit{D}, number of Ferns \textit{N} for original random, meanRandom and bestGini implementations}
+%\label{ferest_versions}
+%\end{tabular}
 
 \subsection{Comparison}
 
