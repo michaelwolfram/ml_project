@@ -46,7 +46,7 @@ We already know about Trees and Forests from the lecture - additionally we read 
 
 For object detection purposes, Ferns are built using binary values as feature vector which initially posed a problem for the chosen PUC-Rio data set containing continuous (e.g the sensor data) and categorical (e.g gender, names) features. A key point of Ferns is chance so we thought it might serve to randomly choose a threshold within the range of each feature and do a simple comparison, resulting in a new binary feature value - this approach was also used by Kursa [2], which encouraged us to continue the implementation.
 
-The goal of this project is, besides the implementation of the two chosen algorithms, the evaluation of Ferns on data with non-binary attributes. Within the original application area of Ferns (fast keypoint recognition), Ferns outperform Trees. Thus, we wanted to evaluate if this relation also holds true for the given data set. To achieve this, we applied various available methods to optimize the classification accuracy of our algorithms in order to compare Ferns and Trees in full depth.
+The goal of this project is, besides the implementation of the two chosen algorithms, the evaluation of Ferns on data with non-binary attributes. Within the original application area of Ferns (fast keypoint recognition), Ferns outperform Trees. Thus, we wanted to evaluate if this relation also holds true for the given data set. To achieve this, we applied various available methods to optimize the classification accuracy of our algorithms in order to compare Ferns and Trees, also regarding times for training and testing.
 
 
 \section{Data}
@@ -77,7 +77,7 @@ For the last stopping heuristic we implemented the impurity measures \textit{Gin
 We used the same settings for each Tree of a Forest.
 
 \subsubsection{Optimizations}
-Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. To further improve the performance of our Trees we iterate over the whole predefined subset of feature dimensions but only over the unique feature values among one feature dimension when searching for the best split at a particular node. For the actual choice of parameters refer to the section "Results".
+Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. To improve the performance of our Trees we implemented  is theFor the actual choice of parameters refer to the section "Results".
 
 
 \subsection{Ferest}
@@ -226,6 +226,28 @@ Firstly, taking the mean of two random values for certain feature dimensions is 
 \end{table}
 
 \subsection{Comparison}
+
+The two sections above concentrate on the behaviour of the two main Machine Learning algorithms that were implemented. The following last section gives a brief overview on differences between Forests and Ferest as well as some comparisons regarding computation time for training and testing for each of the structures.
+
+As it was not feasible to test all possible settings of the Forest for a best accuracy within this project, it is hard to compare classification accuracies between Forest and Ferest. Theoretically, when using the best suited impurity measure, Forests should be at least as accurate as random Ferns. Especially, when comparing the \textit{bestGini} implementation with Forests using a Gini index, behaviour and results should be almost exchangeable. However, as we only have subsets of experiments for all structures on the same data we will not further describe the differences in classification accuracy.
+
+Instead, we want to point out the computational speed of Random Ferests. Table \ref{time_comparisons} shows the immense advance of Ferns over Trees in terms of times necessary for training as well as testing. We compared times for different depths and found that Ferns are 15-25 times faster than Trees for both phases. The speed in training is clearly due to the quick and uncomplicated selection of a random threshold for the binary tests.
+
+
+\begin{table}
+\begin{tabular}{p{3mm}||p{11mm}|p{11mm}|p{11mm}|p{11mm}}
+\textit{D} & \textit{Tree train} & \textit{Fern train} & \textit{Tree test} & \textit{Fern test}\\
+\hline
+\hline
+8 	& 279,89 	& 17,05 	& 220,42 	& 12,31 \\
+\hline
+10 	& 350,49 	& 16,17 	& 266,29	& 13,62 \\
+\hline
+12 	& 351,62 	& 19,80 	& 349,26	& 15,17
+\end{tabular}
+\caption{Comparison of average training and testing times on the whole data set for different depths $D$ of Forest and Ferest}
+\label{time_comparisons}
+\end{table}
 
 
 \onecolumn
