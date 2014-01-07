@@ -61,6 +61,6 @@ catch exc
     save(saveString,'accuracies','trainTimes','testTimes','-v7.3');
 end
 
-saveString = strcat(startAccuraciesString,'_',num2str(i), ...
+saveString = strcat(startAccuraciesString,'_',impurityMeasure, ...
     '_',num2str(0),'_',num2str(currNumTrees),'_all_final',matEnd);
 save(saveString,'accuracies','trainTimes','testTimes','-v7.3');

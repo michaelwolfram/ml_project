@@ -4,21 +4,20 @@ matEnd = '.mat';
 %% Section for final plots.
 % Do not wonder about the name of the variable.
 % It was quite late that day. ;-)
-saveString = strcat(startAccuraciesString,'_',num2str(i), ...
-    '_',num2str(20),'_all_final',matEnd);
+saveString = strcat('Evaluation_Forests/Gini_only/accuracies_gini_final_15_20',matEnd);
 load(saveString);
 
-validDepths = [1,2,4,6,8,10,12,15];
+validDepths = [2,4,6,8,10,12,15];
 numTrees = 1:1:20;
 
 % Plot heatmap.
 figure;
 hold on;
-imagesc(accuracies);
+imagesc(accuracies_all(2:8,:));
 colorbar;
-title('Heatmap of accuracies of forests [%]');
-xlabel('Number of trees');
-ylabel('Depth of trees');
+title('Heatmap of accuracies of Forests [%]');
+xlabel('Number of Trees');
+ylabel('Depth of Trees');
 axis([0.5 20.5 0.5 8.5]);
 axis('image');
 set(gca,'XTick',1:length(numTrees));
@@ -28,16 +27,31 @@ set(gca,'YTickLabel',validDepths);
 hold off;
 
 % Plot training time.
-figure;
-hold on;
-colors=['y','m','c','r','g','b','k','b'];
-for i=1:size(timesTrain_all,1)
-    plot(timesTrain_all(i,:),colors(i));
-end
-title('Training time according to the number of trees');
-xlabel('Number of trees');
-ylabel('Time for training [s]');
-hold off;
+% figure;
+% hold on;
+% colors=['y','m','c','r','g','b','k','b'];
+% for i=1:size(timesTrain_all,1)
+%     plot(timesTrain_all(i,:),colors(i));
+% end
+% title('Training time depending on the number of Trees');
+% xlabel('Number of Trees');
+% ylabel('Time for training [s]');
+% hold off;
+
+% validDepths = [1,2,4,6,8,10,12,15];
+% meanTrainTimes = mean(timesTrain_all,2)';
+% figure;
+% hold on;
+% % colors=['y','m','c','r','g','b','k','b'];
+% % for i=1:size(timesTest_all,1)
+% %     plot(timesTest_all(i,:),colors(i));
+% % end
+% plot(validDepths,meanTrainTimes);
+% set(gca,'XTick',0:15);
+% title('Mean training time of a Tree depending on its depth');
+% xlabel('Depth of Tree');
+% ylabel('Time for testing [s]');
+% hold off;
 
 % Plot testing time.
 figure;
@@ -46,10 +60,20 @@ colors=['y','m','c','r','g','b','k','b'];
 for i=1:size(timesTest_all,1)
     plot(timesTest_all(i,:),colors(i));
 end
-title('Testing time according to the number of trees');
-xlabel('Number of trees');
+title('Testing time depending on the number of Trees');
+xlabel('Number of Trees');
 ylabel('Time for testing [s]');
 hold off;
+
+% meanTestTimes = mean(timesTest_all,2)';
+% figure;
+% hold on;
+% plot(validDepths,meanTestTimes);
+% set(gca,'XTick',0:15);
+% title('Mean testing time of a Tree depending on its depth');
+% xlabel('Depth of Tree');
+% ylabel('Time for testing [s]');
+% hold off;
 
 %% Section for testing some plots with already generated data.
 % DO NOT USE FOR FINAL PLOTS.
@@ -135,7 +159,7 @@ accuracies_12 = zeros(1,20);
 timesTrain_12 = zeros(1,20);
 timesTest_12 = zeros(1,20);
 
-for i=1:11
+for i=1:20
     saveString = strcat(startAccuraciesString,'_','gini',...
         '_',num2str(12),'_',num2str(i),'_',matEnd);
     load(saveString);
@@ -144,12 +168,27 @@ for i=1:11
     timesTest_12(i) = Ttest;
 end
 
+accuracies_15 = zeros(1,20);
+timesTrain_15 = zeros(1,20);
+timesTest_15 = zeros(1,20);
+
+for i=1:20
+    saveString = strcat(startAccuraciesString,'_','gini',...
+        '_',num2str(15),'_',num2str(i),'_',matEnd);
+    load(saveString);
+    accuracies_15(i) = accuracy;
+    timesTrain_15(i) = Ttrain;
+    timesTest_15(i) = Ttest;
+end
+
 accuracies_all =...
-    [accuracies_1;accuracies_2;accuracies_4;accuracies_6;accuracies_8;accuracies_10;accuracies_12;zeros(1,20)];
+    [accuracies_1;accuracies_2;accuracies_4;accuracies_6;accuracies_8;accuracies_10;accuracies_12;accuracies_15];
 timesTrain_all =...
-    [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8;timesTrain_10;timesTrain_12];
+    [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8;timesTrain_10;timesTrain_12;timesTrain_15];
 timesTest_all =...
-    [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8;timesTest_10;timesTest_12];
+    [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8;timesTest_10;timesTest_12;timesTest_15];
+
+% save('Evaluation_Forests/Gini_only/accuracies_gini_final_15_20','accuracies_all','timesTrain_all','timesTest_all','-v7.3');
 
 validDepths = [1,2,4,6,8,10,12,15];
 numTrees = 1:1:20;
