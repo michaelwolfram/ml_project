@@ -77,7 +77,7 @@ For the last stopping heuristic we implemented the impurity measures \textit{Gin
 We used the same settings for each Tree of a Forest.
 
 \subsubsection{Optimizations}
-Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. To improve the performance of our Trees we implemented  is theFor the actual choice of parameters refer to the section "Results".
+Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. To further improve the performance of our Trees we iterate over the whole predefined subset of feature dimensions but only over the unique feature values among one feature dimension when searching for the best split at a particular node. For the actual choice of parameters refer to the section "Results".
 
 
 \subsection{Ferest}
@@ -165,33 +165,15 @@ Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 
 
 \subsection{Ferest}
 
-First, we tested the original implementation of Ferests which is very fast to train and still very accurate even for its random tests on random features:
+It is recognizable that the accuracy of a Ferest tends to increase with increasing number of of Ferns and their depth (see Figure \ref{ferest_heatmap}). 
 
-It is recognizable that the accuracy of a Ferest tends to increase with increasing number of Ferns and their depths (see Figure \ref{ferest_heatmap}). In Figure \ref{ferest_accuracies} one can see that there is a limit for the best accuracy a Ferest with Ferns of a certain depth can reach - even for up to a hundred Ferns, the best result that could be achieved on the given setup for our data set was around 88\%. This means that a Ferest stops improving once it reaches its maximum accuracy but rather than giving worse results it reaches a plateau and stays there. The largest improvements for this implementation were found within the range of the first ten Ferns in a Ferest.\\
-Also, in Figure \ref{ferest_accuracies} the influence of chance can be seen when looking at the plots for depths one and two. Due to the choice of a random threshold, it is possible to choose a bad value or feature. This leads to the depicted unsteady behaviour - especially for Ferests with low depths this effect is quite strong. The same characteristic can be seen in Figure \ref{ferest_heatmap}, e.g. for depth 6 and 25 Ferns in the structure. This effect seems to dissolve the deeper a Fern becomes.
-
-Nevertheless, the depth of a Fern can also become critical when chosen too large. Where Trees tend to overfit for such settings, the number of buckets for the histograms of a Fern increases dramatically. Accordingly, very few samples drop into each bucket while training and therefore, the class-conditional probability distribution is close to being uniform. Informally, every Fern is then uncertain to which class a new sample might belong.\\
-This shows that when increasing the depth of a Ferest, the number of samples in the training set should increase exponentially - for our chosen training set, the best depth seems to be ten.
-
-\begin{figure}[h] 
-\centering
-\includegraphics[width=0.49\textwidth]{Diagrams/heatmap_randFerns_16_30}
-\caption{Heatmap for accuracies of a Ferest with different depths and numbers of Ferns}
-\label{ferest_heatmap}
-\end{figure}
-
-Due to restrictions in time and computation power, we could neither further increase the depth of the used Ferns nor the number of Ferns. But for single samples the following assumptions were confirmed: 
-\begin{itemize}
-\item After reaching a certain depth, a tendency of decreasing accuracies occurs
-\item For depths that are higher than a certain threshold, classification accuracy steadily increases for larger Fern-numbers until it stagnates at a certain value
-\end{itemize} 
-
-\begin{figure}[h] 
-\centering
-\includegraphics[width=0.49\textwidth]{Diagrams/accuracies_RandFerns_12_70}
-\caption{Accuracies of a Ferest for large numbers of Ferns}
-\label{ferest_accuracies}
-\end{figure}
+%\begin{figure}[h] 
+%\centering
+%\hspace{-8mm} 
+%\includegraphics[width=7.5cm]{Diagrams/heatmap_randFerns_16_30}
+%\caption{Accuracies of a Ferest with different depths and number of Ferns}
+%\label{ferest_heatmap}
+%\end{figure}
 
 \subsection{Comparison}
 
