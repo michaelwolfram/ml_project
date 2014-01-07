@@ -4,8 +4,7 @@ matEnd = '.mat';
 %% Section for final plots.
 % Do not wonder about the name of the variable.
 % It was quite late that day. ;-)
-saveString = strcat(startAccuraciesString,'_',num2str(i), ...
-    '_',num2str(20),'_all_final',matEnd);
+saveString = strcat('Evaluation_Forests/Gini_only/accuracies_gini_final_15_20',matEnd);
 load(saveString);
 
 validDepths = [1,2,4,6,8,10,12,15];
@@ -14,7 +13,7 @@ numTrees = 1:1:20;
 % Plot heatmap.
 figure;
 hold on;
-imagesc(accuracies);
+imagesc(accuracies_all);
 colorbar;
 title('Heatmap of accuracies of forests [%]');
 xlabel('Number of trees');
@@ -39,6 +38,19 @@ xlabel('Number of trees');
 ylabel('Time for training [s]');
 hold off;
 
+meanTrainTimes = mean(timesTrain_all,2)';
+figure;
+hold on;
+% colors=['y','m','c','r','g','b','k','b'];
+% for i=1:size(timesTest_all,1)
+%     plot(timesTest_all(i,:),colors(i));
+% end
+plot(meanTrainTimes);
+title('Mean training time of a Tree according to its depth');
+xlabel('Depth of tree');
+ylabel('Time for testing [s]');
+hold off;
+
 % Plot testing time.
 figure;
 hold on;
@@ -48,6 +60,15 @@ for i=1:size(timesTest_all,1)
 end
 title('Testing time according to the number of trees');
 xlabel('Number of trees');
+ylabel('Time for testing [s]');
+hold off;
+
+meanTestTimes = mean(timesTest_all,2)';
+figure;
+hold on;
+plot(meanTestTimes);
+title('Mean testing time of a Tree according to its depth');
+xlabel('Depth of tree');
 ylabel('Time for testing [s]');
 hold off;
 
@@ -163,6 +184,8 @@ timesTrain_all =...
     [timesTrain_1;timesTrain_2;timesTrain_4;timesTrain_6;timesTrain_8;timesTrain_10;timesTrain_12;timesTrain_15];
 timesTest_all =...
     [timesTest_1;timesTest_2;timesTest_4;timesTest_6;timesTest_8;timesTest_10;timesTest_12;timesTest_15];
+
+% save('Evaluation_Forests/Gini_only/accuracies_gini_final_15_20','accuracies_all','timesTrain_all','timesTest_all','-v7.3');
 
 validDepths = [1,2,4,6,8,10,12,15];
 numTrees = 1:1:20;
