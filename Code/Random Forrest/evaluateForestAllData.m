@@ -56,7 +56,7 @@ try
             else
                 saveString = strcat(startAccuraciesString,'_',impurityMeasure,...
                     '_',num2str(maxHeight),'_',num2str(currNumTrees),'_',matEnd);
-                save(saveString,'Ttrain','-v7.3');
+                save(saveString,'Ttrain','forest','-v7.3');
             end
         end
     end

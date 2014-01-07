@@ -1,6 +1,7 @@
 \documentclass[twocolumn]{article}
 \usepackage{ml_homework_template}
-\usepackage{amsmath,amsthm,amssymb} 
+\usepackage{amsmath,amsthm,amssymb}
+\usepackage[pdftex]{graphicx}
 
 % You should submit your final project by emailing it to fp@class.brml.org. The subject line must read "final project". 
 % If the subject line does not match, an error email is returned; otherwise, a positive ACK is replied. Automated deadline 
@@ -133,6 +134,16 @@ This section evaluates the numerous experiments that were executed within this p
 \subsection{Forest}
 
 \subsection{Ferest}
+
+It is recognizable that the accuracy of a Ferest tends to increase with increasing number of of Ferns and their depth (see Figure \ref{ferest_heatmap}). 
+
+\begin{figure}[h] 
+\centering
+\hspace{-8mm} 
+\includegraphics[width=7.5cm]{Diagrams/heatmap_randFerns_16_30}
+\caption{Accuracies of a Ferest with different depths and number of Ferns}
+\label{ferest_heatmap}
+\end{figure}
 
 \subsection{Comparison}
 
