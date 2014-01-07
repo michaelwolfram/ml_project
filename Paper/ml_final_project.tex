@@ -132,6 +132,30 @@ For the first, the only difference to the normal Random Ferest is the way the th
 This section evaluates the numerous experiments that were executed within this project. Benchmarks as well as visualized results are shown for both Forests and Ferests - finally, a detailed comparison between both is given.
 
 \subsection{Forest}
+As mentioned above, we were faced with some limitations regarding the choice of parameter settings used for the evaluation of Forests. Therefore, we decided two split the analysis into the following two parts:
+\subsubsection{Broader variety of parameters}
+Figure \ref{forest_heatmap} and Figure \ref{forest_testing_time} show our results for a broader variety of parameter settings. This induced the restriction that we only were able to evaluate these several configurations on $10\%$ of the training data. Nevertheless, the testing was done using the whole testing set. The Trees of the Forests were trained with the stopping criteria \textit{purity} and a threshold of 2 for the minimum number of samples in a node. The hyperparameter $d$ was equal to 5 and the number of Trees of a Forest was in the range of $[1,20]$.\\
+The accuracy of the Forests was evaluated for the depths 2 ,4, 6, 8, 10, 12 and 15. On the one hand, one can see in Figure \ref{forest_heatmap} that for an increasing number of Trees in a Forest its accuracy increases in the beginning but then starts to stagnate. On the other hand, the more interesting observation is that with a depth of 6 a maximum accuracy is achieved and larger depths do not lead to better results event though with a configuration of depth 15 and 20 Trees a little tendency of increase is noticeable. Being aware of the fact that this cut of increase of accuracy should be somewhere else for the complete training set, we suppose that this indicates some kind of overfitting since the depth of the Trees reaches a questionable size in relation to the relatively small training data set.\\
+Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 testing data samples. The expected linearity between the number of Trees in a
+
+\onecolumn
+\begin{figure}[t] 
+\centering
+\includegraphics[width=\textwidth]{Diagrams/Forests_Heatmap_Gini_15_20}
+\caption{Accuracies of a Forest depending on its number of Trees and the depth of its\\\phantom{Figure 1: }Trees.}
+\label{forest_heatmap}
+\end{figure}
+\begin{figure}[t] 
+\centering
+\includegraphics{Diagrams/Forests_Testing_Times_Gini_15_20}
+\caption{Testing time of a Forest on the whole testing data set depending on its number\\\phantom{Figure 2: }of Trees. The data was evaluated for five different depths of the Trees of a Forest.}
+\label{forest_testing_time}
+\end{figure}
+\twocolumn
+
+
+
+
 
 \subsection{Ferest}
 
