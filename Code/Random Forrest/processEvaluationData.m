@@ -7,17 +7,17 @@ matEnd = '.mat';
 saveString = strcat('Evaluation_Forests/Gini_only/accuracies_gini_final_15_20',matEnd);
 load(saveString);
 
-validDepths = [1,2,4,6,8,10,12,15];
+validDepths = [2,4,6,8,10,12,15];
 numTrees = 1:1:20;
 
 % Plot heatmap.
 figure;
 hold on;
-imagesc(accuracies_all);
+imagesc(accuracies_all(2:8,:));
 colorbar;
-title('Heatmap of accuracies of forests [%]');
-xlabel('Number of trees');
-ylabel('Depth of trees');
+title('Heatmap of accuracies of Forests [%]');
+xlabel('Number of Trees');
+ylabel('Depth of Trees');
 axis([0.5 20.5 0.5 8.5]);
 axis('image');
 set(gca,'XTick',1:length(numTrees));
@@ -27,29 +27,31 @@ set(gca,'YTickLabel',validDepths);
 hold off;
 
 % Plot training time.
-figure;
-hold on;
-colors=['y','m','c','r','g','b','k','b'];
-for i=1:size(timesTrain_all,1)
-    plot(timesTrain_all(i,:),colors(i));
-end
-title('Training time according to the number of trees');
-xlabel('Number of trees');
-ylabel('Time for training [s]');
-hold off;
-
-meanTrainTimes = mean(timesTrain_all,2)';
-figure;
-hold on;
+% figure;
+% hold on;
 % colors=['y','m','c','r','g','b','k','b'];
-% for i=1:size(timesTest_all,1)
-%     plot(timesTest_all(i,:),colors(i));
+% for i=1:size(timesTrain_all,1)
+%     plot(timesTrain_all(i,:),colors(i));
 % end
-plot(meanTrainTimes);
-title('Mean training time of a Tree according to its depth');
-xlabel('Depth of tree');
-ylabel('Time for testing [s]');
-hold off;
+% title('Training time depending on the number of Trees');
+% xlabel('Number of Trees');
+% ylabel('Time for training [s]');
+% hold off;
+
+% validDepths = [1,2,4,6,8,10,12,15];
+% meanTrainTimes = mean(timesTrain_all,2)';
+% figure;
+% hold on;
+% % colors=['y','m','c','r','g','b','k','b'];
+% % for i=1:size(timesTest_all,1)
+% %     plot(timesTest_all(i,:),colors(i));
+% % end
+% plot(validDepths,meanTrainTimes);
+% set(gca,'XTick',0:15);
+% title('Mean training time of a Tree depending on its depth');
+% xlabel('Depth of Tree');
+% ylabel('Time for testing [s]');
+% hold off;
 
 % Plot testing time.
 figure;
@@ -58,19 +60,20 @@ colors=['y','m','c','r','g','b','k','b'];
 for i=1:size(timesTest_all,1)
     plot(timesTest_all(i,:),colors(i));
 end
-title('Testing time according to the number of trees');
-xlabel('Number of trees');
+title('Testing time depending on the number of Trees');
+xlabel('Number of Trees');
 ylabel('Time for testing [s]');
 hold off;
 
-meanTestTimes = mean(timesTest_all,2)';
-figure;
-hold on;
-plot(meanTestTimes);
-title('Mean testing time of a Tree according to its depth');
-xlabel('Depth of tree');
-ylabel('Time for testing [s]');
-hold off;
+% meanTestTimes = mean(timesTest_all,2)';
+% figure;
+% hold on;
+% plot(validDepths,meanTestTimes);
+% set(gca,'XTick',0:15);
+% title('Mean testing time of a Tree depending on its depth');
+% xlabel('Depth of Tree');
+% ylabel('Time for testing [s]');
+% hold off;
 
 %% Section for testing some plots with already generated data.
 % DO NOT USE FOR FINAL PLOTS.

@@ -13,7 +13,7 @@ accuracies = zeros(maxNumTrees,length(validDepths));
 trainTimes = zeros(maxNumTrees,length(validDepths));
 testTimes = zeros(maxNumTrees,length(validDepths));
 
-startAccuraciesString = 'Evaluation_Forests/Gini_only_All/accuracy';
+startAccuraciesString = 'Evaluation_Forests/Gini_only_All_Forest_Part_Michi/accuracy';
 matEnd = '.mat';
 
 try
