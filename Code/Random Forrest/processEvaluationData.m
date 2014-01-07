@@ -26,6 +26,17 @@ set(gca,'YTick',1:length(validDepths));
 set(gca,'YTickLabel',validDepths);
 hold off;
 
+% figure;
+% hold on;
+% colors=['y','m','c','r','g','b','k','b'];
+% for i=2:size(accuracies_all,1)
+%     plot(accuracies_all(i,:),colors(i));
+% end
+% title('Accuracies of Forests depending on the number of Trees');
+% xlabel('Number of Trees');
+% ylabel('Accuracy of classification [%]');
+% hold off;
+
 % Plot training time.
 % figure;
 % hold on;
@@ -50,20 +61,20 @@ hold off;
 % set(gca,'XTick',0:15);
 % title('Mean training time of a Tree depending on its depth');
 % xlabel('Depth of Tree');
-% ylabel('Time for testing [s]');
+% ylabel('Time for training [s]');
 % hold off;
 
 % Plot testing time.
-figure;
-hold on;
-colors=['y','m','c','r','g','b','k','b'];
-for i=1:size(timesTest_all,1)
-    plot(timesTest_all(i,:),colors(i));
-end
-title('Testing time depending on the number of Trees');
-xlabel('Number of Trees');
-ylabel('Time for testing [s]');
-hold off;
+% figure;
+% hold on;
+% colors=['y','m','c','r','g','b','k','b'];
+% for i=1:size(timesTest_all,1)
+%     plot(timesTest_all(i,:),colors(i));
+% end
+% title('Testing time depending on the number of Trees');
+% xlabel('Number of Trees');
+% ylabel('Time for testing [s]');
+% hold off;
 
 % meanTestTimes = mean(timesTest_all,2)';
 % figure;
