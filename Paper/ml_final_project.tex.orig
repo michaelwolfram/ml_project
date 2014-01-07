@@ -50,18 +50,24 @@ The goal of this project is, besides the implementation of the two chosen algori
 
 
 \section{Data}
-sitting: 50631
-sittingdown: 11827
-standing: 47370
-standingup: 12415
-walking: 43390
-
+The provided data set consists of 165633 samples of recorded body postures and movements. On the one hand the features contain information about the humans themselves: name, gender, age, height, weight and body-mass-index. On the other hand sensor readings of accelerometers from human joints are included. This results in a total of 18 features.\\
+The possible postures of the subjects are: 'sitting', 'sittingdown', 'standing', 'standingup' and 'walking'. The distribution of the data set among these classes is as follows:\\\\
+\begin{tabular}{p{2cm}p{2cm}}
+'sitting': & 50631\\
+'sittingdown': & 11827\\
+'standing': & 47370\\
+'standingup': & 12415\\
+'walking': & 43390
+\end{tabular}\\\\
+Given that unequal distribution we selected not just a certain number but rather a particular percentage of randomly drawn data samples from each class for the testing set as stated in the project description. We used the usual partition of $\frac{2}{3}, \frac{1}{3}$ for the training and testing set.\\
+During the evaluation of Forests we were faced with limitations regarding time and computation power. Therefore, we were forced to make a decision whether to evaluate Forests on the whole provided data set or to analyse Forests for a broader variety of combinations of their parameters. Since we consider the latter to be more important we decided to do the majority of our analysis of Forests on $10\%$ of the data set.
 
 
 \section{Method}
 This section gives a short overview of the properties of both methods. The algorithms and basic methods to optimize them were taken from the original papers (see section ''References'') and some lecture slides. In the final implementation we made some slight changes to cope with the given restrictions of this project.
 
 \subsection{Forest}
+This section concisely describes key facts of our implementation of Forests.
 
 \subsubsection{Basic Principle}
 As known from the lecture, we implemented a Forest as ensemble of a certain number of Decision Trees. Our Trees are defined by the following parameters:\\
@@ -71,7 +77,7 @@ For the last stopping heuristic we implemented the impurity measures \textit{Gin
 We used the same settings for each Tree of a Forest.
 
 \subsubsection{Optimizations}
-Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. To improve the performance of our Trees we implemented  is theFor the actual choice of parameters refer to the section "Results".
+Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. To further improve the performance of our Trees we iterate over the whole predefined subset of feature dimensions but only over the unique feature values among one feature dimension when searching for the best split at a particular node. For the actual choice of parameters refer to the section "Results".
 
 
 \subsection{Ferest}
@@ -159,15 +165,14 @@ Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 
 
 \subsection{Ferest}
 
-First, we tested the original implementation of Ferests which is very fast to train and still very accurate even for its random tests on random features:
-
-It is recognizable that the accuracy of a Ferest tends to increase with increasing number of Ferns and their depths (see Figure \ref{ferest_heatmap}). In Figure \ref{ferest_accuracies} one can see that there is a limit for the best accuracy a Ferest with Ferns of a certain depth can reach - even for up to a hundred Ferns, the best result that could be achieved on the given setup for our data set was around 88\%. This means that a Ferest stops improving once it reaches its maximum accuracy but rather than giving worse results it reaches a plateau and stays there. The largest improvements for this implementation were found within the range of the first ten Ferns in a Ferest.\\
-Also, in Figure \ref{ferest_accuracies} the influence of chance can be seen when looking at the plots for depths one and two. Due to the choice of a random threshold, it is possible to choose a bad value or feature. This leads to the depicted unsteady behaviour - especially for Ferests with low depths this effect is quite strong. The same characteristic can be seen in Figure \ref{ferest_heatmap}, e.g. for depth 6 and 25 Ferns in the structure. This effect seems to dissolve the deeper a Fern becomes.
-
-Nevertheless, the depth of a Fern can also become critical when chosen too large. Where Trees tend to overfit for such settings, the number of buckets for the histograms of a Fern increases dramatically. Accordingly, very few samples drop into each bucket while training and therefore, the class-conditional probability distribution is close to being uniform. Informally, every Fern is then uncertain to which class a new sample might belong.\\
-This shows that when increasing the depth of a Ferest, the number of samples in the training set should increase exponentially - for our chosen training set, the best depth seems to be ten.
-
 <<<<<<< HEAD
+It is recognizable that the accuracy of a Ferest tends to increase with increasing number of of Ferns and their depth (see Figure \ref{ferest_heatmap}). 
+=======
+\subsubsection{Random Ferest}
+
+First, we tested the original implementation of Ferests which is very fast to train and still very accurate even for its random tests on random features:
+>>>>>>> 4124e38e4405a0e9353e7b7fdb14f4ed8e041864
+
 %\begin{figure}[h] 
 %\centering
 %\hspace{-8mm} 
@@ -175,27 +180,33 @@ This shows that when increasing the depth of a Ferest, the number of samples in 
 %\caption{Accuracies of a Ferest with different depths and number of Ferns}
 %\label{ferest_heatmap}
 %\end{figure}
-=======
-\begin{figure}[h] 
-\centering
-\includegraphics[width=0.49\textwidth]{Diagrams/heatmap_randFerns_16_30}
-\caption{Heatmap for accuracies of a Ferest with different depths and numbers of Ferns}
-\label{ferest_heatmap}
-\end{figure}
->>>>>>> ed4c93708139f3a8178dcc75f4a85ea69781af76
 
-Due to restrictions in time and computation power, we could neither further increase the depth of the used Ferns nor the number of Ferns. But for single samples the following assumptions were confirmed: 
-\begin{itemize}
-\item After reaching a certain depth, a tendency of decreasing accuracies occurs
-\item For depths that are higher than a certain threshold, classification accuracy steadily increases for larger Fern-numbers until it stagnates at a certain value
-\end{itemize} 
+\subsubsection{Optimized Implementations}
 
-\begin{figure}[h] 
-\centering
-\includegraphics[width=0.49\textwidth]{Diagrams/accuracies_RandFerns_12_70}
-\caption{Accuracies of a Ferest for large numbers of Ferns}
-\label{ferest_accuracies}
-\end{figure}
+Additionally to the original 'completely' random version of the Ferest, we implemented \textit{bestGini} and \textit{meanRandom}. But where training of a single Fern of the same depth took only 15 seconds for 'random' implementations, it already lasted 20 minutes for the heuristical option incorporating costs with Gini as impurity measure. Nevertheless, \textit{bestGini} was still faster for the training by orders of magnitude (see next section about Comparison).
+
+When comparing the classification accuracies of the three different versions that were implemented, in line with expectations, bestGini most often gives the best result (see Table \ref{ferest_versions}). One can see that for larger numbers of Ferns per Ferest, all three implementations deliver comparable outcomes, whereas bestGini generally gives the best initial result for single Ferns. Surprisingly, meanRandom achieves much better accuracies than the original random version - this might be the case because it applies a rather strict assumption on
+
+\begin{tabular}{c|c||c|c|c}
+\textit{D} & \textit{N} & \textit{rnd} & \textit{mean} & \textit{Gini}\\
+\hline
+\hline
+8 	& 1 	& 53.34\% 	& 66.26\% 	& 73.25\% \\
+ 	& 5 	& 59.72\% 	& 79.82\%	& 81.20\% \\
+ 	& 10 	& 76.64\% 	& 86.52\%	& 83.80\% \\
+ 	& 15 	& 80.59\% 	& 86.34\%	& 82.68\% \\
+ 	& 20 	& 77.30\% 	& 85.65\%	& 86.93\% \\
+\hline
+10 	& 1 	& 51.68\% 	& 60.66\%	& 62.05\% \\
+ 	& 5 	& 75.96\% 	& 77.09\%	& 78.69\% \\
+ 	& 10 	& 77.41\% 	& 86.63\%	& 81.97\% \\
+\hline
+12 	& 1 	& 63.03\% 	& 41.31\%	& 53.33\% \\
+ 	& 5 	& 79.66\% 	& 74.68\%	& 76.19\% \\
+ 	& 10 	& 81.81\% 	& 88.38\%	& 81.42\% \\
+\caption{Accuracies of a Ferest with depth \textit{D}, number of Ferns \textit{N} for original random, meanRandom and bestGini implementations}
+\label{ferest_versions}
+\end{tabular}
 
 \subsection{Comparison}
 
