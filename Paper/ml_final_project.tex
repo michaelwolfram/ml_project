@@ -77,7 +77,7 @@ For the last stopping heuristic we implemented the impurity measures \textit{Gin
 We used the same settings for each Tree of a Forest.
 
 \subsubsection{Optimizations}
-Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. For the actual choice of parameters refer to the section "Results".
+Due to the fact that we were faced with limitations regarding time and computation power we did minor modifications to the building process of a Forest. Rather than building a whole new Forest for each different number of Trees within the Forest we just added a new Tree to an existing Forest, trained that particular Tree - with bagging and feature subset selection - and then evaluated the 'updated' Forest. Thus, we were able to monitor the performance of a Forest with its given set of Trees after adding new Trees to it. To improve the performance of our Trees we implemented  is theFor the actual choice of parameters refer to the section "Results".
 
 
 \subsection{Ferest}
@@ -142,7 +142,7 @@ As mentioned above, we were faced with some limitations regarding the choice of 
 \subsubsection{Broader variety of parameters}
 Figure \ref{forest_heatmap} and Figure \ref{forest_testing_time} show our results for a broader variety of parameter settings. This induced the restriction that we only were able to evaluate these several configurations on $10\%$ of the training data. Nevertheless, the testing was done using the whole testing set. The Trees of the Forests were trained with the stopping criteria \textit{purity} and a threshold of 2 for the minimum number of samples in a node. The hyperparameter $d$ was equal to 5 and the number of Trees of a Forest was in the range of $[1,20]$.\\
 The accuracy of the Forests was evaluated for the depths 2 ,4, 6, 8, 10, 12 and 15. On the one hand, one can see in Figure \ref{forest_heatmap} that for an increasing number of Trees in a Forest its accuracy increases in the beginning but then starts to stagnate. On the other hand, the more interesting observation is that with a depth of 6 a maximum accuracy is achieved and larger depths do not lead to better results event though with a configuration of depth 15 and 20 Trees a little tendency of increase is noticeable. Being aware of the fact that this cut of increase of accuracy should be somewhere else for the complete training set, we suppose that this indicates some kind of overfitting since the depth of the Trees reaches a questionable size in relation to the relatively small training data set.\\
-Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 testing data samples. The expected linearity between the number of Trees in a
+Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 testing data samples. The expected linearity between the number of Trees in a Forest and the time for evaluation is totally reflected in the diagram. Moreover, our results reflect the increase of testing time among growing depths of the Trees of a Forest.
 
 \onecolumn
 \begin{figure}[t] 
@@ -167,13 +167,13 @@ Figure \ref{forest_testing_time} shows the time needed for evaluating the 55211 
 
 It is recognizable that the accuracy of a Ferest tends to increase with increasing number of of Ferns and their depth (see Figure \ref{ferest_heatmap}). 
 
-\begin{figure}[h] 
-\centering
-\hspace{-8mm} 
-\includegraphics[width=7.5cm]{Diagrams/heatmap_randFerns_16_30}
-\caption{Accuracies of a Ferest with different depths and number of Ferns}
-\label{ferest_heatmap}
-\end{figure}
+%\begin{figure}[h] 
+%\centering
+%\hspace{-8mm} 
+%\includegraphics[width=7.5cm]{Diagrams/heatmap_randFerns_16_30}
+%\caption{Accuracies of a Ferest with different depths and number of Ferns}
+%\label{ferest_heatmap}
+%\end{figure}
 
 \subsection{Comparison}
 
