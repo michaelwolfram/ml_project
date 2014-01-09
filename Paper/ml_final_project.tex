@@ -30,6 +30,7 @@
 \begin{document}
 \onecolumn
 \maketitle
+\pagenumbering{Roman}
 
 \section*{Abstract}
 
@@ -39,6 +40,7 @@ The programming language of our choice is Matlab - some of the used approaches o
 
 
 \twocolumn
+\pagenumbering{arabic}
 
 \section{Approach}
 % 'what you did'
@@ -96,6 +98,7 @@ The idea of a Ferest is to combine joint class-conditional distributions with a 
 \begin{align*}
 Class(f) \equiv \arg\max_k P(C_k) \prod_{l=1}^L P(F_l\vert C_k)
 \end{align*}
+If desired, it is therefore also possible to specify the probability of each class separately.
 
 \subsubsection{Training}
 
@@ -104,7 +107,8 @@ As described in the section above, a single Fern has to learn the conditional pr
 In the original implementation, every Fern randomly selects $S$ features and does a binary test on them, resulting in a code that can be read as a binary number between $0$ and $2^S-1$. When comparing this with Trees, each of these tests can be seen as the test that is applied on the previously described 'horizontally' shrunk Tree layer - instead of going left or right in a Tree node, a Fern evaluates all $S$ binary tests leading to the required binary code. However, the original implementation was working on image patches to detect objects and the binary tests were picked by comparing two random pixel intensities in the given patch. For our initial implementation, as Kursa [2] suggests, we chose a random threshold within the range of the current feature and compare this threshold with the respective value of each sample. If the value of a sample is smaller or equal to the selected threshold, the binary test returns true and false otherwise.
 
 Like this, we get a decimal number for every training sample by iteratively applying the random tests - this number is then used to put the current sample into one of $2^S$ \textit{buckets}, comparable to hashing.\\
-Using this pattern of dropping samples into buckets for every sample of a class that is present in the training set delivers a multinomial distribution (\textit{histogram}) of the new features (binary tests on random thresholds) for the regarded class. These histograms are then normalized to become an actual probability distribution.
+Using this pattern of dropping samples into buckets for every sample of a class that is present in the training set delivers a multinomial distribution (\textit{histogram}) of the new features (binary tests on random thresholds) for the regarded class. These histograms are then normalized to become an actual probability distribution.\\
+Using this method, as for many other Machine Learning algorithms, we gain information about the internal distribution with every training sample. Nevertheless, the ratio of training and testing samples should not be neglected.
 
 To train a Ferest, we simply train $L$ Ferns and store the specific histograms together with the randomly picked thresholds for the tests.
 
@@ -112,7 +116,8 @@ To train a Ferest, we simply train $L$ Ferns and store the specific histograms t
 
 The classification of a new sample using a single Fern is very efficient: The previously stored tests are applied to the tested sample in the same order to find a binary number representing the index of the bucket into which this sample drops. The combined buckets of all classes, after normalizing, then represent the corresponding class posterior distribution given the features of the tested sample. This means that every Fern knows with which certainty a sample would be of which class.
 
-For a Ferest, the results of all Ferns are combined using the Naive Bayes' assumption - which is now more appropriate as all Ferns check on random features and thresholds. So instead of taking the best vote as a Forest does, a Ferest multiplies all Fern probabilities to find the class that is most likely - as a result, Ferns that were not sure about their classification can be outvoted more easily as each Fern's certainty is incorporated.
+For a Ferest, the results of all Ferns are combined using the Naive Bayes' assumption - which is now more appropriate as all Ferns check on random features and thresholds. So instead of taking the best vote as a Forest does, a Ferest multiplies all Fern probabilities to find the class that is most likely - as a result, Ferns that were not sure about their classification can be outvoted more easily as each Fern's certainty is incorporated.\\
+If the probability of a class in the given set is available, this can be included as well - while training, this probability can be set as the ratio of samples from a certain class over all samples.
 
 \subsubsection{Adjustments}
 
@@ -237,11 +242,6 @@ The two sections above concentrate on the behaviour of the two main Machine Lear
 
 As it was not feasible to test all possible settings of the Forest for a best accuracy within this project, it is hard to compare classification accuracies between Forest and Ferest. Theoretically, when using the best suited impurity measure, Forests should be at least as accurate as random Ferns. Especially, when comparing the \textit{bestGini} implementation with Forests using a Gini index, behaviour and results should be almost exchangeable. However, as we only have subsets of experiments for all structures on the same data we will not further describe the differences in classification accuracy.
 
-Instead, we want to point out the computational speed of Random Ferests. Table \ref{time_comparisons} shows the immense advance of Ferns over Trees in terms of times necessary for training as well as testing. We compared times for different depths and found that Ferns are 15-25 times faster than Trees for both phases. The speed in training is clearly due to the quick and uncomplicated selection of a random threshold for the binary tests.
-
-%more bla?
-
-
 \begin{table}
 \begin{tabular}{p{3mm}||p{11mm}|p{11mm}|p{11mm}|p{11mm}}
 \textit{D} & \textit{Tree train} & \textit{Fern train} & \textit{Tree test} & \textit{Fern test}\\
@@ -256,6 +256,15 @@ Instead, we want to point out the computational speed of Random Ferests. Table \
 \caption{Comparison of average training and testing times on the whole data set for different depths $D$ of Forest and Ferest}
 \label{time_comparisons}
 \end{table}
+
+Instead, we want to point out the computational speed of Random Ferests. Table \ref{time_comparisons} shows the immense advance of Ferns over Trees in terms of times necessary for training as well as testing. We compared times for different depths and found that Ferns are 15-25 times faster than Trees for both phases, even for the Forest being trained on only 10\% of the data. Incorporating single experiments on the whole data set, Ferests train up to 50 times faster than Forests under the same conditions.\\
+The speed in training is clearly due to the quick and uncomplicated selection of a random threshold for the binary tests. Searching the best feature and value for a split at a specific Tree node by comparing costs using a Gini index is comparably very time-consuming.\\
+The significant differences in testing times are unexplainable to a certain extent. Given the structure of both implementations, evaluation works very similar - $S$ tests are applied to the given sample and thereafter the maximum probability is chosen. We assume the reasons for the difference lie in the efficient implementation of Ferns when applying all tests at once instead of 'going through' the Trees to select the appropriate tests. Additionally, we assume it might partially be due to the chosen programming language (Matlab - "MATrix LABoratory") as for Trees, we're not only using matrix operations but also many other structures (object-oriented) for a good readability and re-usability. Maybe those testing times would be different when using Python or C.
+
+Lastly, we can say that Ferns can very well be applied to data with categorical and continuous values without changing their behaviour. Especially results for the adjusted \textit{meanRandom} implementation of Ferests are very convincing and should be further investigated.
+
+
+
 
 
 \onecolumn
