@@ -2,9 +2,6 @@
 \usepackage{ml_homework_template}
 \usepackage{amsmath,amsthm,amssymb}
 \usepackage[pdftex]{graphicx}
-\usepackage{todonotes}
-
-\newcommand{\comment}[1]{\todo[fancyline]{#1}}
 
 % You should submit your final project by emailing it to fp@class.brml.org. The subject line must read "final project". 
 % If the subject line does not match, an error email is returned; otherwise, a positive ACK is replied. Automated deadline 
@@ -37,7 +34,7 @@
 
 \section*{Abstract}
 
-In this paper we describe our final project for the Machine Learning class of 2013/14 at TUM. We use \comment{used} data set 4) containing information about body postures and movements and apply\comment{applied} two similar Machine Learning algorithms that were implemented within this project. The used algorithms are called 'Ferns' and 'Binary Tree' or 'Random Forest' - we also cover different variations of those algorithms. Moreover, we applied heuristical approaches used for Trees to our Ferns to evaluate advantages regarding classification accuracy.\\
+In this paper we describe our final project for the Machine Learning class of 2013/14 at TUM. We used data set 4) containing information about body postures and movements and applied two similar Machine Learning algorithms that were implemented within this project. The used algorithms are called 'Ferns' and 'Binary Tree' or 'Random Forest' - we also cover different variations of those algorithms. Moreover, we applied heuristical approaches used for Trees to our Ferns to evaluate advantages regarding classification accuracy.\\
 The programming language of our choice is Matlab - some of the used approaches on Ferns are based on ideas from Mustafa \"Ozuyal et al. [1], the development of the trees and forests was only based on ideas from the lecture.
 
 
@@ -52,7 +49,6 @@ We already know about Trees and Forests from the lecture - additionally we read 
 For object detection purposes, Ferns are built using binary values as feature vector which initially posed a problem for the chosen PUC-Rio data set containing continuous (e.g the sensor data) and categorical (e.g gender, names) features. A key point of Ferns is chance so we thought it might serve to randomly choose a threshold within the range of each feature and do a simple comparison, resulting in a new binary feature value - this approach was also used by Kursa [2], which encouraged us to continue the implementation.
 
 The goal of this project is, besides the implementation of the two chosen algorithms, the evaluation of Ferns on data with non-binary attributes. Within the original application area of Ferns (fast keypoint recognition), Ferns outperform Trees. Thus, we wanted to evaluate if this relation also holds true for the given data set. To achieve this, we applied various available methods to optimize the classification accuracy of our algorithms in order to compare Ferns and Trees, also regarding times for training and testing.
-\missingfigure[figwidth=0.5\textwidth]{Why is there no image of a cookie?! :-(}
 
 
 \section{Data}
@@ -125,9 +121,9 @@ To train a Ferest, we simply train $L$ Ferns and store the specific histograms t
 
 \subsubsection{Testing}
 
-The classification of a new sample using a single Fern is very efficient: The previously stored tests are applied to the tested sample in the same order to find a binary number representing the index of the bucket into which this sample drops. The combined buckets of all classes, after normalizing\comment{normalization}, then represent the corresponding class posterior distribution given the features of the tested sample. This means that every Fern knows with which certainty a sample would be of which class.
+The classification of a new sample using a single Fern is very efficient: The previously stored tests are applied to the tested sample in the same order to find a binary number representing the index of the bucket into which this sample drops. The combined buckets of all classes, after normalization, then represent the corresponding class posterior distribution given the features of the tested sample. This means that every Fern knows with which certainty a sample would be of which class.
 
-For a Ferest, the results of all Ferns are combined using the Naive Bayes' assumption - which is now more appropriate as all Ferns check on random features and thresholds. So instead of taking the best vote as a Forest does\comment{as done by Forests...klingt das toller!?}, a Ferest multiplies all Fern probabilities to find the class that is most likely - as a result, Ferns that were not sure about their classification can be outvoted more easily as each Fern's certainty is incorporated.\\
+For a Ferest, the results of all Ferns are combined using the Naive Bayes' assumption - which is now more appropriate as all Ferns check on random features and thresholds. So instead of taking the best vote as done by Forests, a Ferest multiplies all Fern probabilities to find the class that is most likely - as a result, Ferns that were not sure about their classification can be outvoted more easily as each Fern's certainty is incorporated.\\
 If the probability of a class in the given set is available, this can be included as well - while training, this probability can be set as the ratio of samples from a certain class over all samples.
 
 \subsubsection{Adjustments}
@@ -194,8 +190,8 @@ First, we tested the original implementation of Ferests which is very fast to tr
 It is recognizable that the accuracy of a Ferest tends to increase with increasing number of Ferns and their depths (see Figure \ref{ferest_heatmap}). In Figure \ref{ferest_accuracies} one can see that there is a limit for the best accuracy a Ferest with Ferns of a certain depth can reach - even for up to a hundred Ferns, the best result that could be achieved on the given setup for our data set was around 88\%. This means that a Ferest stops improving once it reaches its maximum accuracy but rather than giving worse results it reaches a plateau and stays there. The largest improvements for this implementation were found within the range of the first ten Ferns in a Ferest.\\
 Also, in Figure \ref{ferest_accuracies} the influence of chance can be seen when looking at the plots for depths one and two. Due to the choice of a random threshold, it is possible to choose a bad value or feature. This leads to the depicted unsteady behaviour - especially for Ferests with low depths this effect is quite strong. The same characteristic can be seen in Figure \ref{ferest_heatmap}, e.g. for depth 6 and 25 Ferns in the structure. This effect seems to dissolve the deeper a Fern becomes.
 
-Nevertheless, the depth of a Fern can also become critical when chosen\comment{when being chosen!?} too large. Where Trees tend to overfit for such settings, the number of buckets for the histograms of a Fern increases dramatically. Accordingly, very few samples drop into each bucket while training and therefore, the class-conditional probability distribution is close to being uniform. Informally, every Fern is then uncertain to which class a new sample might belong.\\
-This shows that when increasing the depth of a Ferest\comment{the depth of the Ferns of a Ferest/the depth of a Ferest's Ferns...}, the number of samples in the training set should increase exponentially - for our chosen training set, the best depth seems to be ten.
+Nevertheless, the depth of a Fern can also become critical when being chosen too large. Where Trees tend to overfit for such settings, the number of buckets for the histograms of a Fern increases dramatically. Accordingly, very few samples drop into each bucket while training and therefore, the class-conditional probability distribution is close to being uniform. Informally, every Fern is then uncertain to which class a new sample might belong.\\
+This shows that when increasing the depth of the Ferns of a Ferest, the number of samples in the training set should increase exponentially - for our chosen training set, the best depth seems to be ten.
 
 \begin{figure}[h] 
 \centering
@@ -219,7 +215,7 @@ Due to restrictions in time and computation power, we could neither further incr
 
 \subsubsection{Optimized Implementations}
 
-Additionally to the original 'completely' random version of the Ferest, we implemented \textit{bestGini} and \textit{meanRandom}. But where training of a single Fern of the same depth took only 15 seconds for 'random' implementations, it already lasted 20 minutes for the heuristical option incorporating costs with Gini as impurity measure. Nevertheless, \textit{bestGini} was still faster\comment{than Forests!? das sollte mMn hier noch explizit stehen. ansonsten bezieht mans noch auf die anderne varianten der ferests} for the training by orders of magnitude (see next section about Comparison).
+Additionally to the original 'completely' random version of the Ferest, we implemented \textit{bestGini} and \textit{meanRandom}. But where training of a single Fern of the same depth took only 15 seconds for 'random' implementations, it already lasted 20 minutes for the heuristical option incorporating costs with Gini as impurity measure. Nevertheless, \textit{bestGini} was still faster than Forests for the training by orders of magnitude (see next section about Comparison).
 
 When comparing the classification accuracies of the three different versions that were implemented, in line with expectations, bestGini most often gives the best result (see Table \ref{ferest_versions}). One can see that for larger numbers of Ferns per Ferest, all three implementations deliver comparable outcomes, whereas bestGini generally gives the best initial result for single Ferns. Surprisingly, meanRandom achieves much better accuracies than the original random version. We suppose the following explanation for this phenomenon:\\
 Firstly, taking the mean of two random values for certain feature dimensions is still a random choice, so it is comprehensible that \textit{meanRandom} should not achieve worse accuracies than pure random. The reason for the advance probably is of statistical origin - when having a fixed feature dimension with minimum and maximum value there must be some areas where samples of a certain class accumulate. If this was not the case for all dimensions, it would generally be impossible to successfully learn appropriate distributions. Assuming we need to find a threshold for a feature where the class distribution resembles the sample distribution (meaning that there are different areas that are common for samples of a specific class). When we pick only one random value from those samples, the chance to pick a sample that is in the middle of such a 'crowded' class-area is comparably high - resulting in a split that separates the class evenly (this is not desired). If we pick two values instead, the chance of taking two samples from different class-specific regions is comparably high. Like this, we split this feature in the middle between the two regions and thereby, most probably, also split the two related classes. Therefore, if we combine enough Ferns on hopefully distinctive features, the output will be a very good classification.
